@@ -4,13 +4,7 @@ import { TrashIcon, UpdateIcon } from "@radix-ui/react-icons";
 import { deleteIngredient } from "./actions";
 import { ingredientsTable } from "@/db/schema";
 import { useState } from "react";
-
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { ActionResult } from "@/types/action-result";
 import useFormToast from "@/hooks/use-form-toast";
 import { Badge } from "@/components/ui/badge";
