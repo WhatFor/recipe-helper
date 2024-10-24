@@ -21,6 +21,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const NewIngredientModal = () => {
   const [open, setOpen] = useState(false);
@@ -70,6 +71,12 @@ const NewIngredientModal = () => {
               name="ingredientName"
               type="text"
             />
+          </div>
+          <div className="flex gap-x-3 items-center text-center">
+            <Checkbox id="isPantry" name="isPantry" />
+            <Label className="w-full text-left" htmlFor="isPantry">
+              Pantry
+            </Label>
           </div>
           {!state.successful && <FieldErrors errors={state.errors} />}
           <DialogFooter>

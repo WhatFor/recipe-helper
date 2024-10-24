@@ -10,6 +10,7 @@ import { z } from "zod";
 
 const createIngredientSchema = z.object({
   name: z.string().min(1),
+  is_pantry: z.boolean().optional(),
 });
 
 export async function createIngredient(
@@ -24,6 +25,7 @@ export async function createIngredient(
 
   const values = {
     name: formData.get("ingredientName") as string,
+    is_pantry: (formData.get("isPantry") === "on") as boolean,
   };
 
   const validate = createIngredientSchema.safeParse(values);

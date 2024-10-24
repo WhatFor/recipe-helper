@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/card";
 import { ActionResult } from "@/types/action-result";
 import useFormToast from "@/hooks/use-form-toast";
+import { Badge } from "@/components/ui/badge";
 
 type Ingredient = typeof ingredientsTable.$inferSelect;
 
@@ -46,8 +47,10 @@ const IngredientCard = ({ ingredient }: { ingredient: Ingredient }) => {
         )}
       </button>
       <CardHeader>
-        <CardTitle className="capitalize">{ingredient.name}</CardTitle>
-        <CardDescription>{ingredient.id}</CardDescription>
+        <CardTitle className="capitalize flex gap-x-3 items-center">
+          <span>{ingredient.name}</span>
+          {ingredient.is_pantry && <Badge variant="outline">Pantry</Badge>}
+        </CardTitle>
       </CardHeader>
     </Card>
   );

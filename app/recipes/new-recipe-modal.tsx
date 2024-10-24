@@ -90,15 +90,15 @@ const NewRecipeModal = () => {
             />
           </div>
           <div className="flex gap-x-3 items-center text-center">
-            <Checkbox id="isFast" />
+            <Checkbox id="isFast" name="isFast" />
             <Label className="w-full text-left" htmlFor="isFast">
               Fast
             </Label>
           </div>
           <div className="flex gap-x-3 items-center text-center">
-            <Checkbox id="isSuitableForFridge" />
+            <Checkbox id="isSuitableForFridge" name="isSuitableForFridge" />
             <Label className="w-full text-left" htmlFor="isSuitableForFridge">
-              Suitable for the fridge?
+              Suitable for the fridge
             </Label>
           </div>
           {!state.successful && <FieldErrors errors={state.errors} />}

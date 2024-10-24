@@ -30,9 +30,9 @@ export async function createRecipe(
     name: formData.get("recipeName") as string,
     description: formData.get("recipeDescription") as string,
     link: formData.get("recipeLink") as string,
-    is_fast: (formData.get("isFast") === "true") as boolean,
+    is_fast: (formData.get("isFast") === "on") as boolean,
     is_suitable_for_fridge: (formData.get("isSuitableForFridge") ===
-      "true") as boolean,
+      "on") as boolean,
   };
 
   const validate = upsertRecipeSchema.safeParse(values);
