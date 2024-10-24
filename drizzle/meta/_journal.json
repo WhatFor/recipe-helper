@@ -8,6 +8,27 @@
       "when": 1729702115501,
       "tag": "0000_brave_anthem",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1729784807067,
+      "tag": "0001_colorful_charles_xavier",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1729785906081,
+      "tag": "0002_secret_serpent_society",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1729786622705,
+      "tag": "0003_supreme_shaman",
+      "breakpoints": true
     }
   ]
 }

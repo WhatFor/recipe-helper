@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import RequireAuth from "@/components/require-auth";
+import { Toaster } from "@/components/ui/toaster";
+
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -23,6 +25,7 @@ export default async function RootLayout({
                 {children}
               </div>
             </div>
+            <Toaster />
           </body>
         </html>
       </RequireAuth>

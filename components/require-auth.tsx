@@ -1,4 +1,4 @@
-import { RedirectToSignIn, SignedOut } from "@clerk/nextjs";
+import { RedirectToSignIn, SignedIn, SignedOut } from "@clerk/nextjs";
 
 interface Props {
   children: React.ReactNode;
@@ -10,7 +10,7 @@ const RequireAuth = ({ children }: Props) => {
       <SignedOut>
         <RedirectToSignIn />
       </SignedOut>
-      {children}
+      <SignedIn>{children}</SignedIn>
     </>
   );
 };

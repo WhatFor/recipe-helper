@@ -1,0 +1,1 @@
+ALTER TABLE "recipes" RENAME COLUMN "is_suitable_for_frige" TO "is_suitable_for_fridge";

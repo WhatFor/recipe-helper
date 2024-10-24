@@ -1,4 +1,4 @@
-import { FieldError as T } from "@/types/formResult";
+import { FieldError as T } from "@/types/action-result";
 import FieldError from "./field-error";
 
 interface Props {
@@ -6,13 +6,17 @@ interface Props {
 }
 
 const FieldErrors = ({ errors }: Props) => {
+  if (!errors) {
+    return null;
+  }
+
   return (
-    <>
+    <div className="flex flex-col gap-y-3">
       {errors &&
         errors.map((error) => (
           <FieldError key={error.fieldName} error={error} />
         ))}
-    </>
+    </div>
   );
 };
 

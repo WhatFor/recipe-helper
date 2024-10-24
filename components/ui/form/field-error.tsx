@@ -1,4 +1,6 @@
-import { FieldError as T } from "@/types/formResult";
+import { FieldError as T } from "@/types/action-result";
+import { Alert, AlertDescription, AlertTitle } from "../alert";
+import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
 
 interface Props {
   error: T;
@@ -6,14 +8,13 @@ interface Props {
 
 const FieldError = ({ error }: Props) => {
   return (
-    <div
-      className="text-red-600 flex gap-x-2 text-sm"
-      key={error.fieldName}
-      aria-live="polite"
-    >
-      <span className="uppercase">{error.fieldName}:</span>
-      <span>{error.message}</span>
-    </div>
+    <Alert variant="destructive">
+      <ExclamationTriangleIcon className="h-4 w-4" />
+      <AlertTitle className="capitalize font-bold">
+        {error.fieldName}
+      </AlertTitle>
+      <AlertDescription>{error.message}</AlertDescription>
+    </Alert>
   );
 };
 
