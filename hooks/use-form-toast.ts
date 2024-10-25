@@ -13,8 +13,8 @@ const useFormToast = (formState: ActionResult) => {
     if (shouldDisplayToast) {
       if (formState.successful) {
         toast({
-          title: formState.message.title,
-          description: formState.message.description,
+          title: formState.message?.title ?? "Success",
+          description: formState.message?.description ?? "Operation completed.",
         });
       } else if (formState.errors) {
         console.log("Errors", formState.errors);
