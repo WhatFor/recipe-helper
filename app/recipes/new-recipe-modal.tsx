@@ -55,7 +55,7 @@ const NewRecipeModal = () => {
           <span>New recipe</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="max-w-xl">
         <Form action={formAction}>
           <DialogHeader>
             <DialogTitle>Create Recipe</DialogTitle>

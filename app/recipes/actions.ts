@@ -23,7 +23,7 @@ export async function createRecipe(
   const { userId } = await auth();
 
   if (!userId) {
-    throw new Error("You must be signed in to add an item to your cart");
+    throw new Error("You must be signed in to do that.");
   }
 
   const values = {
@@ -73,8 +73,6 @@ export async function updateRecipe(
   if (!userId) {
     throw new Error("You must be signed in to do that.");
   }
-
-  console.log("isFast", formData.get("isFast"));
 
   const values = {
     name: formData.get("recipeName") as string,

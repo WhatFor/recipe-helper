@@ -65,7 +65,7 @@ const EditRecipeModal = ({ recipe }: { recipe: Recipe }) => {
           <span>Edit</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="max-w-xl">
         <Form action={formAction}>
           <DialogHeader>
             <DialogTitle>Edit {recipe.name}</DialogTitle>

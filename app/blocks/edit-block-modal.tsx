@@ -1,8 +1,8 @@
 "use client";
 
 import { ActionResult } from "@/types/action-result";
-import { createRecipe } from "./actions";
-import { startTransition, useState } from "react";
+import { updateBlock } from "./actions";
+import { startTransition, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -10,23 +10,28 @@ import FieldErrors from "@/components/ui/form/field-errors";
 import Form from "@/components/ui/form";
 import useResetableActionState from "@/hooks/use-reset-action-state";
 import useFormToast from "@/hooks/use-form-toast";
+import { blocksTable } from "@/db/schema";
 
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Checkbox } from "@/components/ui/checkbox";
 
-const EditRecipeIngredientsModal = () => {
+type Block = typeof blocksTable.$inferSelect;
+
+const EditBlockModal = ({ block }: { block: Block }) => {
   const [open, setOpen] = useState(false);
 
+  const [blockValues, setBlockValues] = useState(block);
+
+  const updateBlockWithId = updateBlock.bind(null, block.id);
+
   const [state, formAction, pending, reset] = useResetableActionState(
-    createRecipe,
+    updateBlockWithId,
     {
       state: "init",
       errors: undefined,
@@ -45,63 +50,45 @@ const EditRecipeIngredientsModal = () => {
     }
   };
 
+  useEffect(() => {
+    if (state.state === "dirty" && state.successful) {
+      onOpenChange(false);
+    }
+  });
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         <Button variant="outline">
-          <span>Ingredients</span>
+          <span>Edit</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-xl">
         <Form action={formAction}>
           <DialogHeader>
-            <DialogTitle>Create Recipe</DialogTitle>
-            <DialogDescription>Create a new recipe.</DialogDescription>
+            <DialogTitle>Edit {block.name} block</DialogTitle>
           </DialogHeader>
           <div className="flex flex-col gap-y-2">
-            <Label htmlFor="recipeName">Name</Label>
+            <Label htmlFor="blockName">Name</Label>
             <Input
               autoFocus={true}
               autoComplete="off"
-              id="recipeName"
-              name="recipeName"
+              id="blockName"
+              name="blockName"
               type="text"
+              value={blockValues.name}
+              onChange={(e) =>
+                setBlockValues((prev) => ({
+                  ...prev,
+                  name: e.target.value,
+                }))
+              }
             />
-          </div>
-          <div className="flex flex-col gap-y-2">
-            <Label htmlFor="recipeDescription">Description</Label>
-            <Input
-              autoComplete="off"
-              id="recipeDescription"
-              name="recipeDescription"
-              type="text"
-            />
-          </div>
-          <div className="flex flex-col gap-y-2">
-            <Label htmlFor="recipeLink">Link</Label>
-            <Input
-              autoComplete="off"
-              id="recipeLink"
-              name="recipeLink"
-              type="text"
-            />
-          </div>
-          <div className="flex gap-x-3 items-center text-center">
-            <Checkbox id="isFast" />
-            <Label className="w-full text-left" htmlFor="isFast">
-              Fast
-            </Label>
-          </div>
-          <div className="flex gap-x-3 items-center text-center">
-            <Checkbox id="isSuitableForFridge" />
-            <Label className="w-full text-left" htmlFor="isSuitableForFridge">
-              Suitable for the fridge?
-            </Label>
           </div>
           {!state.successful && <FieldErrors errors={state.errors} />}
           <DialogFooter>
             <Button type="submit" disabled={pending}>
-              Add
+              Save
             </Button>
           </DialogFooter>
         </Form>
@@ -110,4 +97,4 @@ const EditRecipeIngredientsModal = () => {
   );
 };
 
-export default EditRecipeIngredientsModal;
+export default EditBlockModal;

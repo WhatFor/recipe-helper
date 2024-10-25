@@ -3,6 +3,8 @@ export interface FieldError {
   message: string;
 }
 
+export type DataResult<T> = { data: T } & ActionResult;
+
 export type ActionResult = CommonResult & (SuccessfulResult | FailedResult);
 
 type CommonResult = {
@@ -12,7 +14,7 @@ type CommonResult = {
 
 type SuccessfulResult = {
   successful: true;
-  message: {
+  message?: {
     title: string;
     description: string;
   };
