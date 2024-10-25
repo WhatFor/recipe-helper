@@ -1,9 +1,13 @@
 "use server";
 
-import { recipesTable } from "@/db/schema";
-import { ActionResult } from "@/types/action-result";
+import {
+  ingredientsTable,
+  recipeIngredientsTable,
+  recipesTable,
+} from "@/db/schema";
+import { ActionResult, DataResult } from "@/types/action-result";
 import { auth } from "@clerk/nextjs/server";
-import { eq } from "drizzle-orm";
+import { and, eq, ilike } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/vercel-postgres";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
@@ -131,6 +135,107 @@ export async function deleteRecipe(id: number): Promise<ActionResult> {
     message: {
       title: "Recipe deleted",
       description: "The recipe has been deleted successfully.",
+    },
+  };
+}
+
+export type FindIngredientsResult = {
+  id: number;
+  name: string;
+};
+
+export async function findIngredients(
+  name: string,
+  recipeId: number
+): Promise<DataResult<FindIngredientsResult[]>> {
+  if (!name) {
+    return {
+      state: "init",
+      successful: true,
+      timestamp: Date.now(),
+      data: [],
+    };
+  }
+
+  const db = drizzle();
+
+  const existingIngredients = await db
+    .select({
+      id: recipeIngredientsTable.ingredientId,
+    })
+    .from(recipeIngredientsTable)
+    .where(eq(recipeIngredientsTable.recipeId, recipeId));
+
+  const result = await db
+    .select({
+      id: ingredientsTable.id,
+      name: ingredientsTable.name,
+    })
+    .from(ingredientsTable)
+    .where(ilike(ingredientsTable.name, "%" + name + "%"));
+
+  const filtered = result.filter(
+    (x) => !existingIngredients.some((y) => y.id === x.id)
+  );
+
+  return {
+    state: "init",
+    successful: true,
+    timestamp: Date.now(),
+    data: filtered,
+  };
+}
+
+export async function addIngredientToRecipe(
+  recipeId: number,
+  ingredientId: number
+): Promise<ActionResult> {
+  const db = drizzle();
+
+  await db.insert(recipeIngredientsTable).values({
+    recipeId: recipeId,
+    ingredientId: ingredientId,
+    quantity: "0",
+  });
+
+  revalidatePath("/recipes");
+
+  return {
+    state: "dirty",
+    successful: true,
+    timestamp: Date.now(),
+    message: {
+      title: "Ingredient added",
+      description: "The ingredient has been added to the recipe successfully.",
+    },
+  };
+}
+
+export async function removeIngredientFromRecipe(
+  recipeId: number,
+  ingredientId: number
+): Promise<ActionResult> {
+  const db = drizzle();
+
+  await db
+    .delete(recipeIngredientsTable)
+    .where(
+      and(
+        eq(recipeIngredientsTable.recipeId, recipeId),
+        eq(recipeIngredientsTable.ingredientId, ingredientId)
+      )
+    );
+
+  revalidatePath("/recipes");
+
+  return {
+    state: "dirty",
+    successful: true,
+    timestamp: Date.now(),
+    message: {
+      title: "Ingredient removed",
+      description:
+        "The ingredient has been removed from the recipe successfully.",
     },
   };
 }

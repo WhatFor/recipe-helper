@@ -1,49 +1,116 @@
 "use client";
 
-import { ActionResult } from "@/types/action-result";
-import { createRecipe } from "./actions";
-import { startTransition, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import FieldErrors from "@/components/ui/form/field-errors";
-import Form from "@/components/ui/form";
-import useResetableActionState from "@/hooks/use-reset-action-state";
-import useFormToast from "@/hooks/use-form-toast";
+import useDebounce from "@/hooks/use-debounce";
+import { useToast } from "@/hooks/use-toast";
+import { RecipeWithIngredients } from "./page";
+import {
+  addIngredientToRecipe,
+  findIngredients,
+  FindIngredientsResult,
+  removeIngredientFromRecipe,
+} from "./actions";
 
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Checkbox } from "@/components/ui/checkbox";
 
-const EditRecipeIngredientsModal = () => {
+import {
+  Cross1Icon,
+  MagnifyingGlassIcon,
+  PlusIcon,
+  TrashIcon,
+} from "@radix-ui/react-icons";
+
+const EditRecipeIngredientsModal = ({
+  recipe,
+}: {
+  recipe: RecipeWithIngredients;
+}) => {
+  const { toast } = useToast();
   const [open, setOpen] = useState(false);
 
-  const [state, formAction, pending, reset] = useResetableActionState(
-    createRecipe,
-    {
-      state: "init",
-      errors: undefined,
-    } as ActionResult
-  );
+  const [searching, setSearching] = useState(false);
+  const [ingredientSearch, setIngredientSearch] = useState("");
+  const [ingredientsFound, setIngredientsFound] = useState<
+    FindIngredientsResult[]
+  >([]);
+  const debouncedSearch = useDebounce(ingredientSearch, 500);
 
-  useFormToast(state);
+  const resetSearch = () => {
+    setIngredientSearch("");
+    setIngredientsFound([]);
+  };
 
   const onOpenChange = (open: boolean) => {
+    resetSearch();
     setOpen(open);
+  };
 
-    if (!open) {
-      startTransition(() => {
-        reset();
+  const fetchIngredients = async () => {
+    const response = await findIngredients(debouncedSearch, recipe.id);
+    setSearching(false);
+
+    if (response.successful) {
+      setIngredientsFound(response.data);
+    } else {
+      toast({
+        title: "Uh oh",
+        description: "Something went wrong",
       });
     }
   };
+
+  const onSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearching(true);
+    setIngredientSearch(e.target.value);
+  };
+
+  const onClickAddIngredient = async (ingredientId: number) => {
+    const result = await addIngredientToRecipe(recipe.id, ingredientId);
+
+    if (result.successful) {
+      toast({
+        title: "Ingredient added",
+        description: "The ingredient has been added to the recipe.",
+      });
+
+      resetSearch();
+    } else {
+      toast({
+        title: "Uh oh",
+        description: "Something went wrong",
+      });
+    }
+  };
+
+  const onClickRemoveIngredient = async (ingredientId: number) => {
+    const result = await removeIngredientFromRecipe(recipe.id, ingredientId);
+
+    if (result.successful) {
+      toast({
+        title: result.message?.title,
+        description: result.message?.description,
+      });
+    } else {
+      toast({
+        title: "Uh oh",
+        description: "Something went wrong",
+      });
+    }
+  };
+
+  useEffect(() => {
+    fetchIngredients();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearch]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -53,58 +120,73 @@ const EditRecipeIngredientsModal = () => {
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-xl">
-        <Form action={formAction}>
-          <DialogHeader>
-            <DialogTitle>Create Recipe</DialogTitle>
-            <DialogDescription>Create a new recipe.</DialogDescription>
-          </DialogHeader>
-          <div className="flex flex-col gap-y-2">
-            <Label htmlFor="recipeName">Name</Label>
-            <Input
-              autoFocus={true}
-              autoComplete="off"
-              id="recipeName"
-              name="recipeName"
-              type="text"
-            />
+        <DialogHeader>
+          <DialogTitle>{recipe.name} ingredients</DialogTitle>
+          <DialogDescription>
+            Manage ingredients in the {recipe.name} recipe.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="relative">
+          <Input
+            id="search"
+            name="search"
+            autoComplete="off"
+            placeholder="Add an ingredient"
+            onChange={onSearchChange}
+            value={ingredientSearch}
+          ></Input>
+          {ingredientSearch ? (
+            <Cross1Icon
+              onClick={resetSearch}
+              className="absolute cursor-pointer hover:bg-foreground/20 rounded p-1 size-7 right-1 top-1"
+            ></Cross1Icon>
+          ) : (
+            <MagnifyingGlassIcon className="absolute size-5 text-foreground/50 right-3 top-2" />
+          )}
+        </div>
+        {ingredientsFound.length > 0 && (
+          <div className="flex flex-col gap-y-2 border border-foreground rounded-md p-4">
+            <h1 className="font-semibold leading-none tracking-tight mb-2">
+              Search results
+            </h1>
+            {ingredientsFound.map((ingredient) => (
+              <div
+                className="flex justify-between items-center p-3 border rounded-md hover:bg-foreground/10"
+                key={ingredient.id}
+              >
+                <p>{ingredient.name}</p>
+                <Button
+                  onClick={() => onClickAddIngredient(ingredient.id)}
+                  size="icon"
+                >
+                  <PlusIcon />
+                </Button>
+              </div>
+            ))}
           </div>
-          <div className="flex flex-col gap-y-2">
-            <Label htmlFor="recipeDescription">Description</Label>
-            <Input
-              autoComplete="off"
-              id="recipeDescription"
-              name="recipeDescription"
-              type="text"
-            />
+        )}
+        {!searching && ingredientSearch && ingredientsFound.length === 0 && (
+          <div className="flex gap-x-2 border text-destructive border-destructive rounded-md p-4">
+            <Cross1Icon />
+            <h1 className="leading-none tracking-tight">No results found</h1>
           </div>
-          <div className="flex flex-col gap-y-2">
-            <Label htmlFor="recipeLink">Link</Label>
-            <Input
-              autoComplete="off"
-              id="recipeLink"
-              name="recipeLink"
-              type="text"
-            />
-          </div>
-          <div className="flex gap-x-3 items-center text-center">
-            <Checkbox id="isFast" />
-            <Label className="w-full text-left" htmlFor="isFast">
-              Fast
-            </Label>
-          </div>
-          <div className="flex gap-x-3 items-center text-center">
-            <Checkbox id="isSuitableForFridge" />
-            <Label className="w-full text-left" htmlFor="isSuitableForFridge">
-              Suitable for the fridge?
-            </Label>
-          </div>
-          {!state.successful && <FieldErrors errors={state.errors} />}
-          <DialogFooter>
-            <Button type="submit" disabled={pending}>
-              Add
-            </Button>
-          </DialogFooter>
-        </Form>
+        )}
+        <div className="flex flex-col gap-y-2">
+          {recipe.ingredients.map((ingredient) => (
+            <div
+              className="flex justify-between items-center p-3 border rounded-md hover:bg-foreground/10"
+              key={ingredient.id}
+            >
+              <p>{ingredient.name}</p>
+              <Button
+                onClick={() => onClickRemoveIngredient(ingredient.id)}
+                size="icon"
+              >
+                <TrashIcon />
+              </Button>
+            </div>
+          ))}
+        </div>
       </DialogContent>
     </Dialog>
   );

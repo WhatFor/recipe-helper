@@ -2,11 +2,15 @@
 
 import { Link2Icon, TrashIcon, UpdateIcon } from "@radix-ui/react-icons";
 import { deleteRecipe } from "./actions";
-import { recipesTable } from "@/db/schema";
 import { useState } from "react";
 import { ActionResult } from "@/types/action-result";
 import useFormToast from "@/hooks/use-form-toast";
 import { Badge } from "@/components/ui/badge";
+
+import { Separator } from "@/components/ui/separator";
+import EditRecipeModal from "./edit-recipe-modal";
+import EditRecipeIngredientsModal from "./edit-ingredients-modal";
+import { RecipeWithIngredients } from "./page";
 
 import {
   Card,
@@ -14,13 +18,8 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import EditRecipeModal from "./edit-recipe-modal";
-import EditRecipeIngredientsModal from "./edit-ingredients-modal";
 
-type Recipe = typeof recipesTable.$inferSelect;
-
-const RecipeCard = ({ recipe }: { recipe: Recipe }) => {
+const RecipeCard = ({ recipe }: { recipe: RecipeWithIngredients }) => {
   const [deleting, setDeleting] = useState(false);
 
   const [result, setResult] = useState<ActionResult>({
@@ -68,7 +67,7 @@ const RecipeCard = ({ recipe }: { recipe: Recipe }) => {
         <CardDescription>{recipe.description}</CardDescription>
         <div className="flex gap-x-3 pt-2">
           <EditRecipeModal recipe={recipe} />
-          <EditRecipeIngredientsModal />
+          <EditRecipeIngredientsModal recipe={recipe} />
         </div>
       </CardHeader>
     </Card>

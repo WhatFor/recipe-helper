@@ -52,7 +52,6 @@ const EditBlockRecipesModal = ({ block }: { block: BlockWithRecipes }) => {
     setSearching(false);
 
     if (response.successful) {
-      console.log(response.data);
       setRecipesFound(response.data);
     } else {
       toast({
