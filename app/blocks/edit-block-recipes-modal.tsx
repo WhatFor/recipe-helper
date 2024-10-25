@@ -103,6 +103,7 @@ const EditBlockRecipesModal = ({ block }: { block: BlockWithRecipes }) => {
 
   useEffect(() => {
     fetchRecipes();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearch]);
 
   return (
