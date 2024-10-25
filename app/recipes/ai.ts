@@ -9,6 +9,7 @@ will analyse the website for the following:
 Where the ingredients are a short name and a quantity. If you cannot find a quantity for an ingredient,
 set the quantity to 'null'. Do not add ingredients that are not in the recipe.
 Include all ingredients you find in the recipe. Do not rename any of the ingredients.
+Exclude any 'to taste' directions from ingredient names and quantities.
 For quantities that are not standard grams, millilitres, or teaspoons but are instead 'a clove', 'a handful', etc.,
 then use that as the quantity and not in the name of the ingredient.
 If a recipe is broken up into different sections for different parts of the recipe, then include all ingredients
@@ -33,4 +34,4 @@ You will respond in JSON format. For example:
     ]
 }
     
-Do not include anything other than JSON in the response.`;
+Do not include anything other than JSON in the response. Do not reply in markdown.`;

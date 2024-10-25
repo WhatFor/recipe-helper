@@ -77,10 +77,18 @@ const importAiRecipeSchema = z.object({
   is_suitable_for_fridge: z.boolean(),
 });
 
+export interface AiRecipeResult {
+  name: string;
+  description: string;
+  is_fast: boolean;
+  is_suitable_for_fridge: boolean;
+  ingredients: { name: string; quantity: "string" }[];
+}
+
 export async function importRecipeUsingAi(
   prevState: ActionResult | undefined,
   formData: FormData
-): Promise<ActionResult> {
+): Promise<DataResult<AiRecipeResult>> {
   const { userId } = await auth();
 
   if (!userId) {
@@ -102,7 +110,7 @@ export async function importRecipeUsingAi(
       message: error.message,
     }));
 
-    return { errors } as ActionResult;
+    return { errors } as DataResult<AiRecipeResult>;
   }
 
   const html = await fetch(values.link).then((response) => response.text());
@@ -120,12 +128,14 @@ export async function importRecipeUsingAi(
     })
     .withResponse();
 
-  console.log(data.choices[0].message.content);
+  const resultString = data.choices[0].message.content;
+  const resultJson = JSON.parse(resultString!) as AiRecipeResult;
 
   return {
     state: "dirty",
     successful: true,
     timestamp: Date.now(),
+    data: resultJson,
     message: {
       title: "Recipe created",
       description: "The recipe has been created successfully.",
