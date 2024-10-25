@@ -130,6 +130,12 @@ export async function findRecipe(
   name: string,
   blockId: number
 ): Promise<DataResult<FindRecipeResult[]>> {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("You must be signed in to do that.");
+  }
+
   if (!name) {
     return {
       state: "init",
@@ -172,6 +178,12 @@ export async function addRecipeToBlock(
   blockId: number,
   recipeId: number
 ): Promise<ActionResult> {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("You must be signed in to do that.");
+  }
+
   const db = drizzle();
 
   await db.insert(blockRecipesTable).values({
@@ -196,6 +208,12 @@ export async function removeRecipeFromBlock(
   blockId: number,
   recipeId: number
 ): Promise<ActionResult> {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("You must be signed in to do that.");
+  }
+
   const db = drizzle();
 
   await db

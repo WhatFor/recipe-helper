@@ -11,6 +11,10 @@ import { and, eq, ilike } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/vercel-postgres";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import OpenAI from "openai";
+import { AiPrompt } from "./ai";
+
+const openai = new OpenAI();
 
 const upsertRecipeSchema = z.object({
   name: z.string().min(1).max(255),
@@ -55,6 +59,68 @@ export async function createRecipe(
   await db.insert(recipesTable).values(values);
 
   revalidatePath("/recipes");
+
+  return {
+    state: "dirty",
+    successful: true,
+    timestamp: Date.now(),
+    message: {
+      title: "Recipe created",
+      description: "The recipe has been created successfully.",
+    },
+  };
+}
+
+const importAiRecipeSchema = z.object({
+  link: z.string().min(1).max(1000),
+  is_fast: z.boolean(),
+  is_suitable_for_fridge: z.boolean(),
+});
+
+export async function importRecipeUsingAi(
+  prevState: ActionResult | undefined,
+  formData: FormData
+): Promise<ActionResult> {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("You must be signed in to do that.");
+  }
+
+  const values = {
+    link: formData.get("recipeLink") as string,
+    is_fast: (formData.get("isFast") === "on") as boolean,
+    is_suitable_for_fridge: (formData.get("isSuitableForFridge") ===
+      "on") as boolean,
+  };
+
+  const validate = importAiRecipeSchema.safeParse(values);
+
+  if (!validate.success) {
+    const errors = validate.error.errors.map((error) => ({
+      fieldName: error.path.join("."),
+      message: error.message,
+    }));
+
+    return { errors } as ActionResult;
+  }
+
+  const html = await fetch(values.link).then((response) => response.text());
+
+  const { data } = await openai.chat.completions
+    .create({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: AiPrompt },
+        {
+          role: "user",
+          content: "The HTML you are to analyse is: " + html + '"',
+        },
+      ],
+    })
+    .withResponse();
+
+  console.log(data.choices[0].message.content);
 
   return {
     state: "dirty",
@@ -157,6 +223,12 @@ export async function findIngredients(
     };
   }
 
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("You must be signed in to do that.");
+  }
+
   const db = drizzle();
 
   const existingIngredients = await db
@@ -190,6 +262,12 @@ export async function addIngredientToRecipe(
   recipeId: number,
   ingredientId: number
 ): Promise<ActionResult> {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("You must be signed in to do that.");
+  }
+
   const db = drizzle();
 
   await db.insert(recipeIngredientsTable).values({
@@ -215,6 +293,12 @@ export async function removeIngredientFromRecipe(
   recipeId: number,
   ingredientId: number
 ): Promise<ActionResult> {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("You must be signed in to do that.");
+  }
+
   const db = drizzle();
 
   await db

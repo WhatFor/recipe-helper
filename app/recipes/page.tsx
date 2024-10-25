@@ -9,6 +9,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { desc, eq } from "drizzle-orm";
 import NewRecipeModal from "./new-recipe-modal";
 import RecipeCard from "./recipe-card";
+import NewRecipeWithAiModal from "./new-recipe-with-ai-modal";
 
 interface Ingredient {
   id: number;
@@ -79,6 +80,7 @@ const IngredientsPage = async () => {
     <div className="flex flex-col gap-y-8">
       <Header>Recipes</Header>
       <NewRecipeModal />
+      <NewRecipeWithAiModal />
       <ScrollArea className="h-[600px] w-full rounded-xl border p-5">
         {recipesWithIngredients.map((recipe) => (
           <RecipeCard key={recipe.id} recipe={recipe} />
