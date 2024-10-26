@@ -51,7 +51,7 @@ const EditBlockRecipesModal = ({ block }: { block: BlockWithRecipes }) => {
     const response = await findRecipe(debouncedSearch, block.id);
     setSearching(false);
 
-    if (response.successful) {
+    if (response.successful && response.data) {
       setRecipesFound(response.data);
     } else {
       toast({
