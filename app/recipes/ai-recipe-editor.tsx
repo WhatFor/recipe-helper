@@ -3,10 +3,16 @@ import { useState } from "react";
 import { EditableTextarea } from "@/components/ui/textarea";
 import { EditableInput } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { TrashIcon, UpdateIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
+
+import {
+  EyeClosedIcon,
+  EyeOpenIcon,
+  TrashIcon,
+  UpdateIcon,
+} from "@radix-ui/react-icons";
 
 interface Props {
   recipe: AiRecipeResult;
@@ -26,6 +32,15 @@ const AiEditorRecipe = ({ recipe, onComplete }: Props) => {
     setState((prev) => ({
       ...prev,
       ingredients: prev.ingredients.filter((_, ix) => ix !== index),
+    }));
+  };
+
+  const togglePantry = (index: number) => {
+    setState((prev) => ({
+      ...prev,
+      ingredients: prev.ingredients.map((i, ix) =>
+        ix === index ? { ...i, is_pantry: !i.is_pantry } : i
+      ),
     }));
   };
 
@@ -118,10 +133,13 @@ const AiEditorRecipe = ({ recipe, onComplete }: Props) => {
             <tbody>
               {state.ingredients.map((ingredient, index) => (
                 <tr
-                  className="border-b border-foreground/50 h-10"
+                  className="border-b border-foreground/50 h-10 cursor-pointer"
                   key={ingredient.name}
                 >
-                  <td className="capitalize py-1 w-7/12 truncate">
+                  <td onClick={() => togglePantry(index)}>
+                    {ingredient.is_pantry ? <EyeClosedIcon /> : <EyeOpenIcon />}
+                  </td>
+                  <td className="capitalize py-1 w-6/12 truncate">
                     <EditableInput
                       slim
                       value={ingredient.name}
@@ -163,6 +181,16 @@ const AiEditorRecipe = ({ recipe, onComplete }: Props) => {
             </tbody>
           </table>
         </ScrollArea>
+      </div>
+      <div className="flex gap-x-4">
+        <p className="flex gap-x-1 items-center">
+          <EyeClosedIcon />{" "}
+          <span className="text-sm text-foreground/70">Pantry</span>
+        </p>
+        <p className="flex gap-x-1 items-center">
+          <EyeOpenIcon />{" "}
+          <span className="text-sm text-foreground/70">Non-pantry</span>
+        </p>
       </div>
       <Button disabled={saving} onClick={onClickSave}>
         {saving ? <UpdateIcon className="animate-spin" /> : "Save"}

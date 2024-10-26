@@ -22,6 +22,10 @@ If an ingredient quantity is 'half' or '1/2', convert this value to a decimal fo
 When deciding if a recipe is fast or not, assume recipes that take less than an hour are fast.
 When estimating how well the recipe will keep in the fridge, base this on how well the meal will transfer
 into a container. For example, a salad will not keep well in the fridge, but a curry will.
+For each ingredient, include an 'is_pantry' flag. This should be true if the ingredient is likely to be in a pantry, or is common among many recipes.
+For example: Salt, pepper, and olive oil are pantry items... but chestnut mushrooms are not. Always assume the following are pantry items: salt, pepper,
+oil of all varieties, flour, sugar, onion, garlic, ginger, and any other common spices.
+Never include any type of water in the ingredients list.
 
 You will respond in JSON format. For example:
 
@@ -31,9 +35,9 @@ You will respond in JSON format. For example:
     "is_fast": true,
     "is_suitable_for_fridge": true,
     "ingredients": [
-        {"name: "Chestnut Mushrooms", "quantity": "700g"},
-        {"name: "Spaghetti", "quantity": "500g"},
-        {"name: "Olive Oil", "quantity": "1 tbsp"},
+        {"name: "Chestnut Mushrooms", "quantity": "700g", "is_pantry": false },
+        {"name: "Spaghetti", "quantity": "500g", "is_pantry": false },
+        {"name: "Olive Oil", "quantity": "1 tbsp", "is_pantry": true },
     ]
 }
     

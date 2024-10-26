@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import useDebounce from "@/hooks/use-debounce";
 import { useToast } from "@/hooks/use-toast";
 import { RecipeWithIngredients } from "./page";
+import { ScrollArea } from "@/components/ui/scroll-area";
+
 import {
   addIngredientToRecipe,
   findIngredients,
@@ -24,11 +26,12 @@ import {
 
 import {
   Cross1Icon,
+  EyeClosedIcon,
+  EyeOpenIcon,
   MagnifyingGlassIcon,
   PlusIcon,
   TrashIcon,
 } from "@radix-ui/react-icons";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 const EditRecipeIngredientsModal = ({
   recipe,
@@ -182,11 +185,16 @@ const EditRecipeIngredientsModal = ({
                 className="flex justify-between items-center py-3 px-5 border rounded-md hover:bg-foreground/10"
                 key={ingredient.id}
               >
-                <div className="flex flex-col">
-                  <p>{ingredient.name}</p>
-                  <span className="text-foreground/60 text-sm">
-                    {ingredient.quantity}
-                  </span>
+                <div className="flex gap-x-3">
+                  <div className="flex items-center">
+                    {ingredient.is_pantry ? <EyeClosedIcon /> : <EyeOpenIcon />}
+                  </div>
+                  <div className="flex flex-col">
+                    <p>{ingredient.name}</p>
+                    <span className="text-foreground/60 text-sm">
+                      {ingredient.quantity}
+                    </span>
+                  </div>
                 </div>
                 <Button
                   onClick={() => onClickRemoveIngredient(ingredient.id)}
@@ -198,6 +206,16 @@ const EditRecipeIngredientsModal = ({
             ))}
           </div>
         </ScrollArea>
+        <div className="flex gap-x-4">
+          <p className="flex gap-x-1 items-center">
+            <EyeClosedIcon />{" "}
+            <span className="text-sm text-foreground/70">Pantry</span>
+          </p>
+          <p className="flex gap-x-1 items-center">
+            <EyeOpenIcon />{" "}
+            <span className="text-sm text-foreground/70">Non-pantry</span>
+          </p>
+        </div>
       </DialogContent>
     </Dialog>
   );

@@ -101,7 +101,8 @@ export async function createBlocksWithAi(): Promise<
       .leftJoin(
         ingredientsTable,
         eq(recipeIngredientsTable.ingredientId, ingredientsTable.id)
-      );
+      )
+      .where(eq(ingredientsTable.is_pantry, false));
 
     const uniqueRecipes = recipes
       .map((x) => ({

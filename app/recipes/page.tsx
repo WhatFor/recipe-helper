@@ -15,6 +15,7 @@ interface Ingredient {
   id: number;
   name: string;
   quantity: string;
+  is_pantry: boolean;
 }
 
 export interface RecipeWithIngredients {
@@ -41,6 +42,7 @@ const IngredientsPage = async () => {
       ingredientId: ingredientsTable.id,
       ingredientName: ingredientsTable.name,
       ingredientQuantity: recipeIngredientsTable.quantity,
+      ingredientIsPantry: ingredientsTable.is_pantry,
     })
     .from(recipesTable)
     .leftJoin(
@@ -73,6 +75,7 @@ const IngredientsPage = async () => {
         id: x.ingredientId!,
         name: x.ingredientName!,
         quantity: x.ingredientQuantity!,
+        is_pantry: x.ingredientIsPantry!,
       }))
       .filter((x) => x.id !== null && x.name !== null);
 

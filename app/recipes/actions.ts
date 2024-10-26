@@ -82,7 +82,7 @@ export interface AiRecipeResult {
   is_fast: boolean;
   link: string;
   is_suitable_for_fridge: boolean;
-  ingredients: { name: string; quantity: "string" }[];
+  ingredients: { name: string; quantity: string; is_pantry: boolean }[];
 }
 
 export async function importRecipeUsingAi(
@@ -108,6 +108,26 @@ export async function importRecipeUsingAi(
     }));
 
     return { errors } as DataResult<AiRecipeResult>;
+  }
+
+  const db = drizzle();
+
+  const existingRecipeLink = await db
+    .select({ link: recipesTable.link })
+    .from(recipesTable)
+    .where(eq(recipesTable.link, values.link));
+
+  if (existingRecipeLink.length > 0) {
+    return {
+      state: "dirty",
+      successful: false,
+      timestamp: Date.now(),
+      errors: [],
+      message: {
+        title: "Recipe import failed",
+        description: "The recipe has already been imported.",
+      },
+    };
   }
 
   try {
@@ -218,8 +238,7 @@ export async function completeAiRecipeImport(
     const insertedIngredients = await db
       .insert(ingredientsTable)
       .values(
-        // todo: is_pantry?
-        data.ingredients.map((x) => ({ name: x.name, is_pantry: false }))
+        data.ingredients.map((x) => ({ name: x.name, is_pantry: x.is_pantry }))
       )
       .returning({
         ingredientId: ingredientsTable.id,
