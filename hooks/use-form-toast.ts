@@ -16,7 +16,7 @@ const useFormToast = (formState: ActionResult) => {
           title: formState.message?.title ?? "Success",
           description: formState.message?.description ?? "Operation completed.",
         });
-      } else if (formState.errors) {
+      } else if (formState.errors && formState.errors.length > 0) {
         console.log("Errors", formState.errors);
         toast({
           variant: "destructive",
@@ -25,8 +25,13 @@ const useFormToast = (formState: ActionResult) => {
             .map((error) => error.message)
             .join("\n"),
         });
+      } else if (formState.message) {
+        toast({
+          title: formState.message.title,
+          description: formState.message.description,
+          variant: "destructive",
+        });
       } else {
-        console.log("Something went wrong");
         toast({
           variant: "destructive",
           title: "Uh oh",

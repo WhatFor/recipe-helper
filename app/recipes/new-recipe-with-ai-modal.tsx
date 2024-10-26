@@ -10,6 +10,7 @@ import Form from "@/components/ui/form";
 import useResetableActionState from "@/hooks/use-reset-action-state";
 import { MagicWandIcon, StarIcon, UpdateIcon } from "@radix-ui/react-icons";
 import useFormToast from "@/hooks/use-form-toast";
+import AiEditorRecipe from "./ai-recipe-editor";
 
 import {
   Dialog,
@@ -20,7 +21,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Separator } from "@/components/ui/separator";
 
 const NewRecipeWithAiModal = () => {
   const [open, setOpen] = useState(false);
@@ -45,6 +45,10 @@ const NewRecipeWithAiModal = () => {
     }
   };
 
+  const onCompleteImport = () => {
+    onOpenChange(false);
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
@@ -53,55 +57,13 @@ const NewRecipeWithAiModal = () => {
           <span>Import recipe with AI</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-xl">
+      <DialogContent
+        // Prevent closing the dialog when clicking outside when data loaded
+        onInteractOutside={(e) => state.data && e.preventDefault()}
+        className="max-w-xl"
+      >
         {state.successful && state.data && (
-          <div className="flex flex-col gap-y-3">
-            <div className="flex flex-col gap-y-1">
-              <p className="font-semibold leading-none tracking-tight text-sm text-foreground/70">
-                Name
-              </p>
-              <p>{state.data.name}</p>
-            </div>
-            <div className="flex flex-col gap-y-1">
-              <p className="font-semibold leading-none tracking-tight text-sm text-foreground/70">
-                Description
-              </p>
-              <p>{state.data.description}</p>
-            </div>
-            <div className="flex">
-              <div className="flex w-1/2 flex-col gap-y-1">
-                <p className="font-semibold leading-none tracking-tight text-sm text-foreground/70">
-                  Fast
-                </p>
-                <p>{state.data.is_fast ? "Yes" : "No"}</p>
-              </div>
-              <div className="flex w-1/2 flex-col gap-y-1">
-                <p className="font-semibold leading-none tracking-tight text-sm text-foreground/70">
-                  Suitable for fridge
-                </p>
-                <p>{state.data.is_suitable_for_fridge ? "Yes" : "No"}</p>
-              </div>
-            </div>
-            <Separator />
-            <div className="flex flex-col gap-y-2">
-              <p className="font-semibold leading-none tracking-tight text-sm text-foreground/70">
-                Ingredients
-              </p>
-              <table className="w-full">
-                <tbody>
-                  {state.data.ingredients.map((ingredient) => (
-                    <tr
-                      className="border-b border-foreground/50"
-                      key={ingredient.name}
-                    >
-                      <td className="capitalize py-1">{ingredient.name}</td>
-                      <td className="capitalize">{ingredient.quantity}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <AiEditorRecipe recipe={state.data} onComplete={onCompleteImport} />
         )}
         {!state.data && (
           <Form action={formAction}>

@@ -3,9 +3,14 @@ export interface FieldError {
   message: string;
 }
 
-export type DataResult<T> = { data: T } & ActionResult;
+export type DataResult<T> = { data?: T } & ActionResult;
 
 export type ActionResult = CommonResult & (SuccessfulResult | FailedResult);
+
+type ToastMessage = {
+  title: string;
+  description: string;
+};
 
 type CommonResult = {
   state: "init" | "dirty";
@@ -14,13 +19,11 @@ type CommonResult = {
 
 type SuccessfulResult = {
   successful: true;
-  message?: {
-    title: string;
-    description: string;
-  };
+  message?: ToastMessage;
 };
 
 type FailedResult = {
   successful: false;
   errors: FieldError[] | undefined;
+  message?: ToastMessage;
 };

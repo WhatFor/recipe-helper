@@ -6,14 +6,17 @@ will analyse the website for the following:
 - A guess at how well the recipe will keep in the fridge
 - a list of ingredients
 
-Where the ingredients are a short name and a quantity. If you cannot find a quantity for an ingredient,
-set the quantity to 'null'. Do not add ingredients that are not in the recipe.
-Include all ingredients you find in the recipe. Do not rename any of the ingredients.
+Where the ingredients are a short name and a quantity.
+If you cannot find a quantity for an ingredient, set the quantity to ''.
+Do not add ingredients that are not in the recipe.
+Include all ingredients you find in the recipe, but exclude Salt and Pepper.
+Do not rename any of the ingredients.
+Use title case for the ingredient names.
 Exclude any 'to taste' directions from ingredient names and quantities.
 For quantities that are not standard grams, millilitres, or teaspoons but are instead 'a clove', 'a handful', etc.,
 then use that as the quantity and not in the name of the ingredient.
-If a recipe is broken up into different sections for different parts of the recipe, then include all ingredients
-in one list. Where possible, group the ingredients together. For example, if a section is called 'For the curry' and includes 1 tbsp of olive oil
+If a recipe is broken up into different sections for different parts of the recipe, then include all ingredients in one list.
+Where possible, group the ingredients together. For example, if a section is called 'For the curry' and includes 1 tbsp of olive oil
 and another section is called 'for the rice' and also includes 2tbsp of olive oil, then group these together as 3tbsp of olive oil.
 If an ingredient quantity is 'half' or '1/2', convert this value to a decimal for the response.
 When deciding if a recipe is fast or not, assume recipes that take less than an hour are fast.
@@ -28,9 +31,9 @@ You will respond in JSON format. For example:
     "is_fast": true,
     "is_suitable_for_fridge": true,
     "ingredients": [
-        {"name: "chestnut mushrooms", "quantity": "700g"},
-        {"name: "spaghetti", "quantity": "500g"},
-        {"name: "olive oil", "quantity": "1 tbsp"},
+        {"name: "Chestnut Mushrooms", "quantity": "700g"},
+        {"name: "Spaghetti", "quantity": "500g"},
+        {"name: "Olive Oil", "quantity": "1 tbsp"},
     ]
 }
     

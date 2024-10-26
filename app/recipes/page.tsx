@@ -14,6 +14,7 @@ import NewRecipeWithAiModal from "./new-recipe-with-ai-modal";
 interface Ingredient {
   id: number;
   name: string;
+  quantity: string;
 }
 
 export interface RecipeWithIngredients {
@@ -39,6 +40,7 @@ const IngredientsPage = async () => {
       is_suitable_for_fridge: recipesTable.is_suitable_for_fridge,
       ingredientId: ingredientsTable.id,
       ingredientName: ingredientsTable.name,
+      ingredientQuantity: recipeIngredientsTable.quantity,
     })
     .from(recipesTable)
     .leftJoin(
@@ -66,8 +68,12 @@ const IngredientsPage = async () => {
 
   const recipesWithIngredients = uniqueRecipes.map((recipe) => {
     const ingredients = result
-      .filter((recipe) => recipe.id === recipe.id && recipe.id)
-      .map((x) => ({ id: x.ingredientId!, name: x.ingredientName! }))
+      .filter((r) => recipe.id === r.id && r.id)
+      .map((x) => ({
+        id: x.ingredientId!,
+        name: x.ingredientName!,
+        quantity: x.ingredientQuantity!,
+      }))
       .filter((x) => x.id !== null && x.name !== null);
 
     return {

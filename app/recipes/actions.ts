@@ -1,6 +1,7 @@
 "use server";
 
 import {
+  blockRecipesTable,
   ingredientsTable,
   recipeIngredientsTable,
   recipesTable,
@@ -73,14 +74,13 @@ export async function createRecipe(
 
 const importAiRecipeSchema = z.object({
   link: z.string().min(1).max(1000),
-  is_fast: z.boolean(),
-  is_suitable_for_fridge: z.boolean(),
 });
 
 export interface AiRecipeResult {
   name: string;
   description: string;
   is_fast: boolean;
+  link: string;
   is_suitable_for_fridge: boolean;
   ingredients: { name: string; quantity: "string" }[];
 }
@@ -97,9 +97,6 @@ export async function importRecipeUsingAi(
 
   const values = {
     link: formData.get("recipeLink") as string,
-    is_fast: (formData.get("isFast") === "on") as boolean,
-    is_suitable_for_fridge: (formData.get("isSuitableForFridge") ===
-      "on") as boolean,
   };
 
   const validate = importAiRecipeSchema.safeParse(values);
@@ -113,34 +110,156 @@ export async function importRecipeUsingAi(
     return { errors } as DataResult<AiRecipeResult>;
   }
 
-  const html = await fetch(values.link).then((response) => response.text());
+  try {
+    const html = await fetch(values.link).then((response) => response.text());
 
-  const { data } = await openai.chat.completions
-    .create({
-      model: "gpt-4o-mini",
-      messages: [
-        { role: "system", content: AiPrompt },
-        {
-          role: "user",
-          content: "The HTML you are to analyse is: " + html + '"',
-        },
-      ],
-    })
-    .withResponse();
+    const tryFindBody = html.match(/<body[^>]*>[\s\S]*<\/body>/i);
+    const body = tryFindBody ? tryFindBody[0] : html;
 
-  const resultString = data.choices[0].message.content;
-  const resultJson = JSON.parse(resultString!) as AiRecipeResult;
+    const tryFindMain = body.match(/<main[^>]*>[\s\S]*<\/main>/i);
+    const main = tryFindMain ? tryFindMain[0] : body;
 
-  return {
-    state: "dirty",
-    successful: true,
-    timestamp: Date.now(),
-    data: resultJson,
-    message: {
-      title: "Recipe created",
-      description: "The recipe has been created successfully.",
-    },
-  };
+    const { data } = await openai.chat.completions
+      .create({
+        model: "gpt-4o-mini",
+        messages: [
+          { role: "system", content: AiPrompt },
+          {
+            role: "user",
+            content: "The HTML you are to analyse is: " + main + '"',
+          },
+        ],
+      })
+      .withResponse();
+
+    const resultString = data.choices[0].message.content;
+    const resultJson = JSON.parse(resultString!) as AiRecipeResult;
+    resultJson.link = values.link;
+
+    // Try to dedupe any duplicates
+    resultJson.ingredients = resultJson.ingredients.reduce(
+      (acc, current) =>
+        acc.find((x) => x.name === current.name) ? acc : [...acc, current],
+      [] as AiRecipeResult["ingredients"]
+    );
+
+    return {
+      state: "dirty",
+      successful: true,
+      timestamp: Date.now(),
+      data: resultJson,
+      message: {
+        title: "Recipe imported",
+        description: "Hey, look! The AI has loaded the recipe for you.",
+      },
+    };
+  } catch (error) {
+    console.log(error);
+
+    try {
+      // @ts-expect-error Yolo
+      const code = error.error.code;
+
+      if (code === "context_length_exceeded") {
+        return {
+          state: "dirty",
+          successful: false,
+          timestamp: Date.now(),
+          errors: [],
+          message: {
+            title: "Recipe import failed",
+            description:
+              "The AI was unable to load the recipe. The HTML was too long. Try another website!",
+          },
+        };
+      }
+    } catch {}
+
+    return {
+      state: "dirty",
+      successful: false,
+      timestamp: Date.now(),
+      errors: [],
+      message: {
+        title: "Recipe import failed",
+        description: "The AI was unable to load the recipe. Try again!",
+      },
+    };
+  }
+}
+
+export async function completeAiRecipeImport(
+  data: AiRecipeResult
+): Promise<ActionResult> {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("You must be signed in to do that.");
+  }
+
+  try {
+    const db = drizzle();
+
+    const insertedData = await db
+      .insert(recipesTable)
+      .values({
+        name: data.name,
+        description: data.description,
+        link: data.link,
+        is_fast: data.is_fast,
+        is_suitable_for_fridge: data.is_suitable_for_fridge,
+      })
+      .returning({ recipeId: recipesTable.id });
+
+    const recipeId = insertedData[0].recipeId;
+
+    console.log("saving ingredients", data.ingredients);
+
+    const insertedIngredients = await db
+      .insert(ingredientsTable)
+      .values(
+        // todo: is_pantry?
+        data.ingredients.map((x) => ({ name: x.name, is_pantry: false }))
+      )
+      .returning({
+        ingredientId: ingredientsTable.id,
+        name: ingredientsTable.name,
+      });
+
+    console.log("insertedIngredients", insertedIngredients);
+
+    await db.insert(recipeIngredientsTable).values(
+      data.ingredients.map((x) => ({
+        recipeId: recipeId,
+        ingredientId: insertedIngredients.find((y) => y.name === x.name)!
+          .ingredientId,
+        quantity: x.quantity,
+      }))
+    );
+
+    revalidatePath("/recipes");
+
+    return {
+      state: "dirty",
+      successful: true,
+      timestamp: Date.now(),
+      message: {
+        title: "Recipe created",
+        description: "The recipe has been created successfully.",
+      },
+    };
+  } catch {
+    return {
+      state: "dirty",
+      successful: false,
+      timestamp: Date.now(),
+      errors: [],
+      message: {
+        title: "Recipe creation failed",
+        description: "The recipe could not be created. Try again!",
+      },
+    };
+  }
 }
 
 export async function updateRecipe(
@@ -200,6 +319,13 @@ export async function deleteRecipe(id: number): Promise<ActionResult> {
 
   const db = drizzle();
 
+  await db
+    .delete(recipeIngredientsTable)
+    .where(eq(recipeIngredientsTable.recipeId, id));
+
+  // todo: have orphaned ingredients now. don't care too much, but.
+
+  await db.delete(blockRecipesTable).where(eq(blockRecipesTable.recipeId, id));
   await db.delete(recipesTable).where(eq(recipesTable.id, id));
 
   revalidatePath("/recipes");

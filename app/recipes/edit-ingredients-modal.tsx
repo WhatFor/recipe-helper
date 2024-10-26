@@ -28,6 +28,7 @@ import {
   PlusIcon,
   TrashIcon,
 } from "@radix-ui/react-icons";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const EditRecipeIngredientsModal = ({
   recipe,
@@ -58,7 +59,7 @@ const EditRecipeIngredientsModal = ({
     const response = await findIngredients(debouncedSearch, recipe.id);
     setSearching(false);
 
-    if (response.successful) {
+    if (response.successful && response.data) {
       setIngredientsFound(response.data);
     } else {
       toast({
@@ -171,22 +172,32 @@ const EditRecipeIngredientsModal = ({
             <h1 className="leading-none tracking-tight">No results found</h1>
           </div>
         )}
-        <div className="flex flex-col gap-y-2">
-          {recipe.ingredients.map((ingredient) => (
-            <div
-              className="flex justify-between items-center p-3 border rounded-md hover:bg-foreground/10"
-              key={ingredient.id}
-            >
-              <p>{ingredient.name}</p>
-              <Button
-                onClick={() => onClickRemoveIngredient(ingredient.id)}
-                size="icon"
+        <ScrollArea
+          className="h-full overflow-y-auto"
+          style={{ height: "calc(100vh - 500px)" }}
+        >
+          <div className="flex flex-col gap-y-2">
+            {recipe.ingredients.map((ingredient) => (
+              <div
+                className="flex justify-between items-center py-3 px-5 border rounded-md hover:bg-foreground/10"
+                key={ingredient.id}
               >
-                <TrashIcon />
-              </Button>
-            </div>
-          ))}
-        </div>
+                <div className="flex flex-col">
+                  <p>{ingredient.name}</p>
+                  <span className="text-foreground/60 text-sm">
+                    {ingredient.quantity}
+                  </span>
+                </div>
+                <Button
+                  onClick={() => onClickRemoveIngredient(ingredient.id)}
+                  size="icon"
+                >
+                  <TrashIcon />
+                </Button>
+              </div>
+            ))}
+          </div>
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );
