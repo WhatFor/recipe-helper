@@ -5,6 +5,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { asc, eq } from "drizzle-orm";
 import BlockCard from "./block-card";
 import NewBlockModal from "./new-block-modal";
+import CreateBlocksWithAiModal from "./create-blocks-with-ai-modal";
 
 interface Recipe {
   id: number;
@@ -53,6 +54,7 @@ const BlocksPage = async () => {
     <div className="flex flex-col gap-y-8">
       <Header>Blocks</Header>
       <NewBlockModal />
+      <CreateBlocksWithAiModal />
       <ScrollArea className="h-[600px] w-full rounded-xl border p-5">
         {blocksWithRecipes.map((b) => (
           <BlockCard key={b.id} block={b} />

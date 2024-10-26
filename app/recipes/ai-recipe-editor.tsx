@@ -121,7 +121,7 @@ const AiEditorRecipe = ({ recipe, onComplete }: Props) => {
                   className="border-b border-foreground/50 h-10"
                   key={ingredient.name}
                 >
-                  <td className="capitalize py-1 w-7/12">
+                  <td className="capitalize py-1 w-7/12 truncate">
                     <EditableInput
                       slim
                       value={ingredient.name}

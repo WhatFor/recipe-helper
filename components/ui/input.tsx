@@ -30,10 +30,12 @@ const EditableInput = ({
   value,
   onChange,
   slim,
+  className,
 }: {
   value: string;
   onChange: (value: string) => void;
   slim?: boolean;
+  className?: string;
 }) => {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [val, setVal] = React.useState(value);
@@ -72,7 +74,8 @@ const EditableInput = ({
           className={cn(
             "border border-foreground/50 text-base",
             slim && "py-0 h-8",
-            !editing && "hidden"
+            !editing && "hidden",
+            className
           )}
         />
         <Button
@@ -83,7 +86,11 @@ const EditableInput = ({
         </Button>
       </div>
       <p
-        className={cn("cursor-pointer pl-3 w-full h-6", editing && "hidden")}
+        className={cn(
+          "cursor-pointer pl-3 w-full h-6",
+          editing && "hidden",
+          className
+        )}
         onClick={onClickEdit}
       >
         {value}

@@ -1,12 +1,22 @@
 "use server";
 
-import { blockRecipesTable, blocksTable, recipesTable } from "@/db/schema";
+import {
+  blockRecipesTable,
+  blocksTable,
+  ingredientsTable,
+  recipeIngredientsTable,
+  recipesTable,
+} from "@/db/schema";
 import { ActionResult, DataResult } from "@/types/action-result";
 import { auth } from "@clerk/nextjs/server";
 import { and, eq, ilike } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/vercel-postgres";
 import { revalidatePath } from "next/cache";
+import OpenAI from "openai";
 import { z } from "zod";
+import { AiPrompt } from "./ai";
+
+const openai = new OpenAI();
 
 const upsertBlockSchema = z.object({
   name: z.string().min(1).max(255),
@@ -52,6 +62,167 @@ export async function createBlock(
       description: "The block has been created successfully.",
     },
   };
+}
+
+export interface AiBlocksResult {
+  blocks: {
+    name: string;
+    recipes: { name: string }[];
+    similarity: number;
+    common_ingredients: string[];
+  }[];
+  unused: string[];
+}
+
+export async function createBlocksWithAi(): Promise<
+  DataResult<AiBlocksResult>
+> {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("You must be signed in to do that.");
+  }
+
+  try {
+    const db = drizzle();
+
+    const recipes = await db
+      .select({
+        id: recipesTable.id,
+        name: recipesTable.name,
+        ingredientId: ingredientsTable.id,
+        ingredientName: ingredientsTable.name,
+      })
+      .from(recipesTable)
+      .leftJoin(
+        recipeIngredientsTable,
+        eq(recipesTable.id, recipeIngredientsTable.recipeId)
+      )
+      .leftJoin(
+        ingredientsTable,
+        eq(recipeIngredientsTable.ingredientId, ingredientsTable.id)
+      );
+
+    const uniqueRecipes = recipes
+      .map((x) => ({
+        id: x.id,
+        name: x.name,
+      }))
+      .filter(
+        (value, index, self) =>
+          self.findIndex((x) => x.id === value.id) === index
+      );
+
+    const recipesWithIngredients = uniqueRecipes.map((recipe) => {
+      const ingredients = recipes
+        .filter((r) => recipe.id === r.id && r.id)
+        .map((x) => ({
+          id: x.ingredientId!,
+          name: x.ingredientName!,
+        }))
+        .filter((x) => x.id !== null && x.name !== null);
+
+      return {
+        ...recipe,
+        ingredients,
+      };
+    });
+
+    const stringRecipies = recipesWithIngredients.map(
+      (x) => `${x.name}: (${x.ingredients.map((y) => y.name).join(", ")})`
+    );
+
+    const userContent =
+      "The recipes you are to process are:\r\n- " +
+      stringRecipies.join("\r\n- ");
+
+    console.log("Generating blocks. User content:", userContent);
+
+    const { data } = await openai.chat.completions
+      .create({
+        model: "gpt-4o-mini",
+        messages: [
+          { role: "system", content: AiPrompt },
+          {
+            role: "user",
+            content: userContent,
+          },
+        ],
+      })
+      .withResponse();
+
+    console.log("Generating blocks result:", data.choices[0].message.content);
+
+    const resultString = data.choices[0].message.content;
+    const resultObj = JSON.parse(resultString!);
+
+    // Check if we got our error back
+    if (resultObj.error) {
+      const err = resultObj.error?.message;
+      const code = resultObj.error?.code;
+
+      console.log("Failed to generate blocks. Err: ", err);
+
+      if (code === "0001") {
+        return {
+          state: "dirty",
+          successful: false,
+          timestamp: Date.now(),
+          errors: [],
+          message: {
+            title: "Recipe import failed",
+            description:
+              "The AI was unable to generate blocks, because it couldn't create enough groups. Do you have enough recipes?",
+          },
+        };
+      }
+    }
+
+    const resultAiObj = resultObj as AiBlocksResult;
+
+    return {
+      state: "dirty",
+      successful: true,
+      message: {
+        title: "Blocks created",
+        description: "The blocks have been created successfully.",
+      },
+      timestamp: Date.now(),
+      data: resultAiObj,
+    };
+  } catch (error) {
+    console.log(error);
+
+    try {
+      // @ts-expect-error Yolo
+      const code = error.error.code;
+
+      if (code === "context_length_exceeded") {
+        return {
+          state: "dirty",
+          successful: false,
+          timestamp: Date.now(),
+          errors: [],
+          message: {
+            title: "Recipe import failed",
+            description:
+              "The AI was unable to generate blocks, because you have too many recipes. Please delete some recipes and try again.",
+          },
+        };
+      }
+    } catch {}
+
+    return {
+      state: "dirty",
+      successful: false,
+      timestamp: Date.now(),
+      errors: [],
+      message: {
+        title: "AI failed",
+        description: "The AI was unable to process your recipes. Try again!",
+      },
+    };
+  }
 }
 
 export async function updateBlock(
