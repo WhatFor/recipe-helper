@@ -3,7 +3,6 @@ import { AiBlocksResult } from "./actions";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { EditableInput } from "@/components/ui/input";
 import { useState } from "react";
-import { Separator } from "@/components/ui/separator";
 
 interface Props {
   result: AiBlocksResult;
