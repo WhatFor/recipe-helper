@@ -33,7 +33,10 @@ const BlocksPage = ({ blocks }: Props) => {
           setOpen={setNewBlocksWithAiModalOpen}
         />
       </div>
-      <ScrollArea className="h-[600px] w-full rounded-xl border p-3 mb-3">
+      <ScrollArea
+        className="h-full w-full rounded-xl border p-3 mb-3"
+        style={{ height: "calc(100vh - 200px)" }}
+      >
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2">
           {blocks.map((b) => (
             <BlockCard key={b.id} block={b} />
