@@ -74,7 +74,7 @@ const NewRecipeWithAiModal = ({ open, setOpen }: Props) => {
               <DialogTitle className="flex gap-x-3">
                 <MagicWandIcon className="size-5" />
                 <span className="hidden md:block">
-                  Create recipe using Artificial Intelligence
+                  Import recipe using Artificial Intelligence
                 </span>
                 <span className="block md:hidden">Create recipe using AI</span>
               </DialogTitle>
