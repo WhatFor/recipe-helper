@@ -33,7 +33,7 @@ const RecipesPage = ({ recipes }: Props) => {
           setOpen={setNewRecipeWithAiModalOpen}
         />
       </div>
-      <ScrollArea className="h-[600px] w-full rounded-xl border p-3">
+      <ScrollArea className="h-[600px] w-full rounded-xl border p-3 mb-3">
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2">
           {recipes.map((recipe) => (
             <RecipeCard key={recipe.id} recipe={recipe} />
