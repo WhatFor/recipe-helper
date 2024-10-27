@@ -62,7 +62,7 @@ const Step1 = ({ recipeCount }: { recipeCount: number }) => {
   return (
     <StepSection completed={hasRecipes}>
       <StepNumber number={1} />
-      <div className="px-8 py-5 h-full">
+      <div className="p-8 pt-6 h-full">
         {hasRecipes ? (
           <div className="flex flex-col justify-between gap-y-5 h-full">
             <div className="flex flex-col gap-y-2">
@@ -122,7 +122,7 @@ const Step2 = ({ blockCount }: { blockCount: number }) => {
   return (
     <StepSection completed={hasBlocks}>
       <StepNumber number={2} />
-      <div className="px-8 py-5 h-full">
+      <div className="p-8 pt-6 h-full">
         {hasBlocks ? (
           <div className="flex flex-col justify-between gap-y-5 h-full">
             <div className="flex flex-col gap-y-2">
@@ -173,7 +173,7 @@ const Step3 = () => {
   return (
     <StepSection completed={false}>
       <StepNumber number={3} />
-      <div className="px-8 py-5 h-full">
+      <div className="p-8 pt-6 h-full">
         <div className="flex flex-col justify-between gap-y-5 h-full">
           <div className="flex flex-col gap-y-2">
             <h3 className="font-semibold text-xl flex gap-x-3 items-center">
