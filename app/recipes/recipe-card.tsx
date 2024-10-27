@@ -1,23 +1,23 @@
 "use client";
 
-import {
-  CheckCircledIcon,
-  CrossCircledIcon,
-  LightningBoltIcon,
-  Link2Icon,
-  StopwatchIcon,
-  TrashIcon,
-  UpdateIcon,
-} from "@radix-ui/react-icons";
 import { deleteRecipe } from "./actions";
 import { useState } from "react";
 import { ActionResult } from "@/types/action-result";
+import DeleteButton from "@/components/ui/delete-button";
 import useFormToast from "@/hooks/use-form-toast";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import EditRecipeModal from "./edit-recipe-modal";
 import EditRecipeIngredientsModal from "./edit-ingredients-modal";
 import { RecipeWithIngredients } from "./page";
+
+import {
+  CheckCircledIcon,
+  CrossCircledIcon,
+  LightningBoltIcon,
+  Link2Icon,
+  StopwatchIcon,
+} from "@radix-ui/react-icons";
 
 import {
   Card,
@@ -44,17 +44,7 @@ const RecipeCard = ({ recipe }: { recipe: RecipeWithIngredients }) => {
 
   return (
     <Card key={recipe.id} className="relative">
-      <button
-        onClick={onDelete}
-        disabled={deleting}
-        className="border-b border-l absolute top-0 right-0 bottom-0 flex items-center rounded-r-xl p-3 cursor-pointer hover:bg-foreground/10"
-      >
-        {deleting ? (
-          <UpdateIcon className="text-foreground/40 animate-spin size-5" />
-        ) : (
-          <TrashIcon className="text-destructive size-5" />
-        )}
-      </button>
+      <DeleteButton deleting={deleting} onDelete={onDelete} />
       <CardHeader className="pr-20 pb-5 h-full">
         <CardTitle className="capitalize truncate flex gap-x-3 items-center mb-1">
           <span>{recipe.name}</span>

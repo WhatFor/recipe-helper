@@ -11,6 +11,7 @@ import EditBlockModal from "./edit-block-modal";
 import { BlockWithRecipes } from "./page";
 import { Badge } from "@/components/ui/badge";
 import EditBlockRecipesModal from "./edit-block-recipes-modal";
+import DeleteButton from "@/components/ui/delete-button";
 
 const RecipeCard = ({ block }: { block: BlockWithRecipes }) => {
   const [deleting, setDeleting] = useState(false);
@@ -30,7 +31,7 @@ const RecipeCard = ({ block }: { block: BlockWithRecipes }) => {
 
   return (
     <Card key={block.id} className="relative">
-      <button
+      {/* <button
         onClick={onDelete}
         disabled={deleting}
         className="border-b border-l absolute top-0 right-0 bottom-0 flex items-center rounded-r-xl p-3 cursor-pointer hover:bg-foreground/10"
@@ -40,7 +41,8 @@ const RecipeCard = ({ block }: { block: BlockWithRecipes }) => {
         ) : (
           <TrashIcon className="text-destructive size-5" />
         )}
-      </button>
+      </button> */}
+      <DeleteButton deleting={deleting} onDelete={onDelete} />
       <CardHeader className="pr-20">
         <CardTitle className="capitalize truncate flex gap-x-3 items-center mb-1">
           <span>{block.name}</span>
