@@ -2,7 +2,7 @@
 
 import { AiBlocksResult, createBlocksWithAi } from "./actions";
 import { DataResult } from "@/types/action-result";
-import { startTransition, useState } from "react";
+import { startTransition } from "react";
 import { Button } from "@/components/ui/button";
 import Form from "@/components/ui/form";
 import useResetableActionState from "@/hooks/use-reset-action-state";
@@ -20,9 +20,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-const CreateBlocksWithAiModal = () => {
-  const [open, setOpen] = useState(false);
+interface Props {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+}
 
+const CreateBlocksWithAiModal = ({ open, setOpen }: Props) => {
   const [state, formAction, pending, reset] = useResetableActionState(
     createBlocksWithAi,
     {
@@ -52,7 +55,7 @@ const CreateBlocksWithAiModal = () => {
       <DialogTrigger asChild>
         <Button>
           <StarIcon />
-          <span>Create blocks with AI</span>
+          <span>Create plans with Artificial Intelligence</span>
         </Button>
       </DialogTrigger>
       <DialogContent
@@ -68,11 +71,11 @@ const CreateBlocksWithAiModal = () => {
             <DialogHeader>
               <DialogTitle className="flex gap-x-3">
                 <MagicWandIcon className="size-5" />
-                Create blocks with AI
+                Create meal plans using Artificial Intelligence
               </DialogTitle>
               <DialogDescription>
-                Use AI magic to transform your recipes into an efficient, fresh
-                meal plan.
+                Use AI magic to transform your recipes into efficient, fresh
+                meal plans.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>

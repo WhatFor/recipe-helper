@@ -2,7 +2,8 @@
 
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
-import { useRouter } from "next/navigation";
+//import { useRouter } from "next/navigation";
+import { useRouter } from "nextjs-toploader/app";
 
 import {
   CheckCircledIcon,
@@ -50,8 +51,12 @@ const Step1 = ({ recipeCount }: { recipeCount: number }) => {
 
   const hasRecipes = recipeCount > 0;
 
-  const onClick = () => {
+  const onClickAiImport = () => {
     router.push("/recipes?ai_import=1");
+  };
+
+  const onClickView = () => {
+    router.push("/recipes");
   };
 
   return (
@@ -71,8 +76,11 @@ const Step1 = ({ recipeCount }: { recipeCount: number }) => {
               </p>
             </div>
             <div>
-              <Button variant="outline" onClick={onClick}>
+              <Button variant="default" onClick={onClickAiImport}>
                 Import more
+              </Button>
+              <Button variant="link" onClick={onClickView}>
+                View recipes
               </Button>
             </div>
           </div>
@@ -89,7 +97,7 @@ const Step1 = ({ recipeCount }: { recipeCount: number }) => {
               </p>
             </div>
             <div>
-              <Button onClick={onClick}>Get started</Button>
+              <Button onClick={onClickAiImport}>Get started</Button>
             </div>
           </div>
         )}
@@ -103,7 +111,11 @@ const Step2 = ({ blockCount }: { blockCount: number }) => {
 
   const hasBlocks = blockCount > 0;
 
-  const onClick = () => {
+  const onClickAiImport = () => {
+    router.push("/blocks?ai_import=1");
+  };
+
+  const onClickView = () => {
     router.push("/blocks");
   };
 
@@ -123,7 +135,7 @@ const Step2 = ({ blockCount }: { blockCount: number }) => {
               </p>
             </div>
             <div>
-              <Button variant="outline" onClick={onClick}>
+              <Button variant="default" onClick={onClickView}>
                 View
               </Button>
             </div>
@@ -141,7 +153,7 @@ const Step2 = ({ blockCount }: { blockCount: number }) => {
               </p>
             </div>
             <div>
-              <Button onClick={onClick}>Analyse</Button>
+              <Button onClick={onClickAiImport}>Analyse</Button>
             </div>
           </div>
         )}

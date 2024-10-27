@@ -26,7 +26,7 @@ export interface RecipeWithIngredients {
   ingredients: Ingredient[];
 }
 
-const IngredientsPage = async () => {
+const Page = async () => {
   const { userId } = await auth();
 
   if (!userId) {
@@ -96,4 +96,4 @@ const IngredientsPage = async () => {
   return <RecipesPage recipes={recipesWithIngredients} />;
 };
 
-export default IngredientsPage;
+export default Page;

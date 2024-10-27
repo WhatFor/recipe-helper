@@ -19,11 +19,11 @@ const AiBlocksEditor = ({ result, onComplete }: Props) => {
   return (
     <div className="flex flex-col gap-y-3 p-3">
       <h1 className="font-semibold leading-none tracking-tight text-lg text-foreground">
-        Your blocks
+        Your meal plan
       </h1>
       <div className="leading-none tracking-tight text-sm text-yellow-200 border rounded p-3 bg-yellow-950 flex flex-col gap-y-1">
         <p>The AI does it&apos;s best, but sometimes it makes mistakes.</p>
-        <p>Rename the blocks below by clicking on the name.</p>
+        <p>Rename the sections below by clicking on the name.</p>
       </div>
       <ScrollArea
         className="h-full overflow-y-auto"

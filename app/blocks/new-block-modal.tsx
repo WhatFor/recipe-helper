@@ -48,16 +48,16 @@ const NewBlockModal = () => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
-        <Button>
+        <Button variant="outline">
           <PlusIcon />
-          <span>New block</span>
+          <span>New meal plan</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-xl">
         <Form action={formAction}>
           <DialogHeader>
-            <DialogTitle>Create Block</DialogTitle>
-            <DialogDescription>Create a new block.</DialogDescription>
+            <DialogTitle>Create plan</DialogTitle>
+            <DialogDescription>Create a new meal plan.</DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-y-2">
             <Label htmlFor="blockName">Name</Label>

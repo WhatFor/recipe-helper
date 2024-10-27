@@ -50,7 +50,7 @@ const NewRecipeModal = () => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
-        <Button>
+        <Button variant="outline">
           <PlusIcon />
           <span>New recipe</span>
         </Button>

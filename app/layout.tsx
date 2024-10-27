@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import RequireAuth from "@/components/require-auth";
 import { Toaster } from "@/components/ui/toaster";
+import NextTopLoader from "nextjs-toploader";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -45,6 +46,7 @@ export default async function RootLayout({
     <ClerkProvider>
       <html className="dark bg-background h-full" lang="en">
         <body className="h-full">
+          <NextTopLoader color="#fff" />
           <RequireAuth>
             <div className="flex flex-col justify-center items-center h-full">
               <NavBar />

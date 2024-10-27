@@ -29,7 +29,7 @@ const RecipeCard = ({ block }: { block: BlockWithRecipes }) => {
   useFormToast(result);
 
   return (
-    <Card key={block.id} className="mb-5 relative">
+    <Card key={block.id} className="relative">
       <button
         onClick={onDelete}
         disabled={deleting}

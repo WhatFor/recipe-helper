@@ -117,7 +117,7 @@ const EditBlockRecipesModal = ({ block }: { block: BlockWithRecipes }) => {
         <DialogHeader>
           <DialogTitle>{block.name} recipes</DialogTitle>
           <DialogDescription>
-            Manage recipes in the {block.name} block.
+            Manage recipes in the {block.name} plan.
           </DialogDescription>
         </DialogHeader>
         <div className="relative">

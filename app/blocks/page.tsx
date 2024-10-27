@@ -1,12 +1,8 @@
 import { drizzle } from "drizzle-orm/vercel-postgres";
 import { blockRecipesTable, blocksTable, recipesTable } from "@/db/schema";
-import Header from "@/components/ui/header";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { asc, eq } from "drizzle-orm";
-import BlockCard from "./block-card";
-import NewBlockModal from "./new-block-modal";
-import CreateBlocksWithAiModal from "./create-blocks-with-ai-modal";
 import { auth } from "@clerk/nextjs/server";
+import BlocksPage from "./blocks-page";
 
 interface Recipe {
   id: number;
@@ -20,7 +16,7 @@ export interface BlockWithRecipes {
   recipes: Recipe[];
 }
 
-const BlocksPage = async () => {
+const Page = async () => {
   const { userId } = await auth();
 
   if (!userId) {
@@ -60,18 +56,7 @@ const BlocksPage = async () => {
     };
   });
 
-  return (
-    <div className="flex flex-col gap-y-8">
-      <Header>Blocks</Header>
-      <NewBlockModal />
-      <CreateBlocksWithAiModal />
-      <ScrollArea className="h-[600px] w-full rounded-xl border p-5">
-        {blocksWithRecipes.map((b) => (
-          <BlockCard key={b.id} block={b} />
-        ))}
-      </ScrollArea>
-    </div>
-  );
+  return <BlocksPage blocks={blocksWithRecipes} />;
 };
 
-export default BlocksPage;
+export default Page;
