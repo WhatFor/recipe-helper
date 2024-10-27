@@ -70,3 +70,11 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+.header-gradient {
+  background: #f72585;
+  background: linear-gradient(to right, #f72585 0%, #480ca8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}

@@ -1,9 +1,8 @@
 import { auth } from "@clerk/nextjs/server";
 import { count, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/vercel-postgres";
-
 import { blocksTable, recipesTable } from "@/db/schema";
-import Onboarding from "@/components/onboarding";
+import Landing from "@/components/landing";
 
 const Home = async () => {
   const { userId } = await auth();
@@ -31,16 +30,11 @@ const Home = async () => {
     .execute();
 
   return (
-    <main className="flex flex-col items-center">
-      <div className="max-w-3xl w-full bg-foreground/30">
-        <div className="">
-          <h1>Cuisino</h1>
-        </div>
-        <Onboarding
-          recipeCount={recipeCount[0].count}
-          blockCount={blockCount[0].count}
-        />
-      </div>
+    <main className="flex flex-col h-full items-center">
+      <Landing
+        recipeCount={recipeCount[0].count}
+        blockCount={blockCount[0].count}
+      />
     </main>
   );
 };

@@ -9,14 +9,19 @@ import { Card, CardContent } from "@/components/ui/card";
 import { PlusIcon } from "@radix-ui/react-icons";
 import { RecipeWithIngredients } from "./page";
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 interface Props {
   recipes: RecipeWithIngredients[];
 }
 
 const RecipesPage = ({ recipes }: Props) => {
-  const [newRecipeWithAiModalOpen, setNewRecipeWithAiModalOpen] =
-    useState(false);
+  const params = useSearchParams();
+  const aiImport = params.get("ai_import");
+
+  const [newRecipeWithAiModalOpen, setNewRecipeWithAiModalOpen] = useState(
+    aiImport === "1"
+  );
 
   return (
     <div className="flex flex-col gap-y-8">
