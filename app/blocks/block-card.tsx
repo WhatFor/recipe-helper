@@ -40,14 +40,6 @@ const RecipeCard = ({ block }: { block: BlockWithRecipes }) => {
             {block.recipes.length}{" "}
             {block.recipes.length !== 1 ? "Recipes" : "Recipe"}
           </Badge>
-          {/* <Badge variant="outline">
-            {recipe.is_suitable_for_fridge
-              ? "Fridge-suitable"
-              : "Not fridge-suitable"}
-          </Badge>
-          <a href={recipe.link} className="flex items-center" target="_blank">
-            <Link2Icon className="size-4" />
-          </a> */}
         </div>
         <Separator />
         <div className="flex gap-x-3 pt-2">

@@ -26,7 +26,7 @@ const RecipesPage = ({ recipes }: Props) => {
   return (
     <div className="flex flex-col gap-y-3">
       <Header>Your recipes</Header>
-      <div className="flex flex-col-reverse md:flex-row gap-3 justify-between">
+      <div className="flex flex-col-reverse md:flex-row gap-3 justify-end">
         <NewRecipeModal />
         <NewRecipeWithAiModal
           open={newRecipeWithAiModalOpen}

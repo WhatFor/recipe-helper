@@ -26,7 +26,7 @@ const BlocksPage = ({ blocks }: Props) => {
   return (
     <div className="flex flex-col gap-y-3">
       <Header>Meal plans</Header>
-      <div className="flex flex-col-reverse md:flex-row gap-3 justify-between">
+      <div className="flex flex-col-reverse md:flex-row gap-3 justify-end">
         <NewBlockModal />
         <CreateBlocksWithAiModal
           open={newBlocksWithAiModalOpen}
