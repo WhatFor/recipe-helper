@@ -71,9 +71,14 @@ const CreateBlocksWithAiModal = ({ open, setOpen }: Props) => {
             <DialogHeader>
               <DialogTitle className="flex gap-x-3">
                 <MagicWandIcon className="size-5" />
-                Create meal plans using Artificial Intelligence
+                <span className="hidden md:block">
+                  Create meal plans using Artificial Intelligence
+                </span>
+                <span className="block md:hidden ">
+                  Create meal plans using AI
+                </span>
               </DialogTitle>
-              <DialogDescription>
+              <DialogDescription className="text-left">
                 Use AI magic to transform your recipes into efficient, fresh
                 meal plans.
               </DialogDescription>
