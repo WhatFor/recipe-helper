@@ -16,6 +16,7 @@ interface Recipe {
 export interface BlockWithRecipes {
   id: number;
   name: string;
+  user_id: string;
   recipes: Recipe[];
 }
 
@@ -32,6 +33,7 @@ const BlocksPage = async () => {
     .select({
       id: blocksTable.id,
       name: blocksTable.name,
+      user_id: blocksTable.user_id,
       recipeId: recipesTable.id,
       recipeName: recipesTable.name,
     })
@@ -42,7 +44,7 @@ const BlocksPage = async () => {
     .orderBy(asc(blocksTable.name));
 
   const uniqueBlocks = result
-    .map((x) => ({ name: x.name, id: x.id }))
+    .map((x) => ({ name: x.name, id: x.id, user_id: x.user_id }))
     .filter(
       (value, index, self) => self.findIndex((x) => x.id === value.id) === index
     );
