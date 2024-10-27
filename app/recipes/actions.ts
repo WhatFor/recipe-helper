@@ -445,9 +445,9 @@ export async function findIngredients(
       )
     );
 
-  const filtered = result.filter(
-    (x) => !existingIngredients.some((y) => y.id === x.id)
-  );
+  const filtered = result
+    .filter((x) => !existingIngredients.some((y) => y.id === x.id))
+    .slice(0, 10);
 
   return {
     state: "init",

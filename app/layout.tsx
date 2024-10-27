@@ -49,7 +49,7 @@ export default async function RootLayout({
           <RequireAuth>
             <div className="flex flex-col justify-center items-center">
               <NavBar />
-              <div className="w-full max-w-2xl flex flex-col gap-y-12 pb-8 pt-4">
+              <div className="w-full max-w-7xl flex flex-col gap-y-12 pb-8 pt-4 px-2">
                 {children}
               </div>
             </div>

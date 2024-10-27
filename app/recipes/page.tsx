@@ -1,16 +1,13 @@
+import RecipesPage from "./recipes-page";
 import { drizzle } from "drizzle-orm/vercel-postgres";
+import { desc, eq } from "drizzle-orm";
+import { auth } from "@clerk/nextjs/server";
+
 import {
   ingredientsTable,
   recipeIngredientsTable,
   recipesTable,
 } from "@/db/schema";
-import Header from "@/components/ui/header";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { desc, eq } from "drizzle-orm";
-import NewRecipeModal from "./new-recipe-modal";
-import RecipeCard from "./recipe-card";
-import NewRecipeWithAiModal from "./new-recipe-with-ai-modal";
-import { auth } from "@clerk/nextjs/server";
 
 interface Ingredient {
   id: number;
@@ -45,6 +42,7 @@ const IngredientsPage = async () => {
       description: recipesTable.description,
       link: recipesTable.link,
       is_fast: recipesTable.is_fast,
+      user_id: recipesTable.user_id,
       is_suitable_for_fridge: recipesTable.is_suitable_for_fridge,
       ingredientId: ingredientsTable.id,
       ingredientName: ingredientsTable.name,
@@ -71,6 +69,7 @@ const IngredientsPage = async () => {
       link: x.link,
       is_fast: x.is_fast,
       is_suitable_for_fridge: x.is_suitable_for_fridge,
+      user_id: x.user_id,
     }))
     .filter(
       (value, index, self) => self.findIndex((x) => x.id === value.id) === index
@@ -85,7 +84,8 @@ const IngredientsPage = async () => {
         quantity: x.ingredientQuantity!,
         is_pantry: x.ingredientIsPantry!,
       }))
-      .filter((x) => x.id !== null && x.name !== null);
+      .filter((x) => x.id !== null && x.name !== null)
+      .sort((a, b) => (a.is_pantry === b.is_pantry ? 0 : a.is_pantry ? 1 : -1));
 
     return {
       ...recipe,
@@ -93,18 +93,7 @@ const IngredientsPage = async () => {
     };
   });
 
-  return (
-    <div className="flex flex-col gap-y-8">
-      <Header>Recipes</Header>
-      <NewRecipeModal />
-      <NewRecipeWithAiModal />
-      <ScrollArea className="h-[600px] w-full rounded-xl border p-5">
-        {recipesWithIngredients.map((recipe) => (
-          <RecipeCard key={recipe.id} recipe={recipe} />
-        ))}
-      </ScrollArea>
-    </div>
-  );
+  return <RecipesPage recipes={recipesWithIngredients} />;
 };
 
 export default IngredientsPage;

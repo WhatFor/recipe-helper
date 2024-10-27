@@ -123,14 +123,14 @@ const EditRecipeIngredientsModal = ({
           <span>Ingredients</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-xl">
-        <DialogHeader>
+      <DialogContent className="max-w-7xl">
+        <DialogHeader className="max-w-xl">
           <DialogTitle>{recipe.name} ingredients</DialogTitle>
           <DialogDescription>
             Manage ingredients in the {recipe.name} recipe.
           </DialogDescription>
         </DialogHeader>
-        <div className="relative">
+        <div className="relative max-w-xl">
           <Input
             id="search"
             name="search"
@@ -179,7 +179,7 @@ const EditRecipeIngredientsModal = ({
           className="h-full overflow-y-auto"
           style={{ height: "calc(100vh - 500px)" }}
         >
-          <div className="flex flex-col gap-y-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2 pr-3.5">
             {recipe.ingredients.map((ingredient) => (
               <div
                 className="flex justify-between items-center py-3 px-5 border rounded-md hover:bg-foreground/10"
@@ -199,6 +199,7 @@ const EditRecipeIngredientsModal = ({
                 <Button
                   onClick={() => onClickRemoveIngredient(ingredient.id)}
                   size="icon"
+                  variant="destructive"
                 >
                   <TrashIcon />
                 </Button>

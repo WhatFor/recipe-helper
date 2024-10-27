@@ -2,7 +2,7 @@
 
 import { DataResult } from "@/types/action-result";
 import { AiRecipeResult, importRecipeUsingAi } from "./actions";
-import { startTransition, useState } from "react";
+import { startTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import FieldErrors from "@/components/ui/form/field-errors";
@@ -22,9 +22,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-const NewRecipeWithAiModal = () => {
-  const [open, setOpen] = useState(false);
+interface Props {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+}
 
+const NewRecipeWithAiModal = ({ open, setOpen }: Props) => {
   const [state, formAction, pending, reset] = useResetableActionState(
     importRecipeUsingAi,
     {
