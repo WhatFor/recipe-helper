@@ -3,7 +3,6 @@
 import Onboarding from "./onboarding";
 import { Outfit } from "next/font/google";
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -17,12 +16,7 @@ interface Props {
 
 const Landing = ({ recipeCount, blockCount }: Props) => {
   return (
-    <motion.div
-      className="max-w-3xl h-full w-full"
-      initial={{ opacity: 0, scale: 0.2, translateY: -100 }}
-      animate={{ opacity: 1, scale: 1, translateY: 0 }}
-      transition={{ duration: 0.6, delay: 0, ease: "easeInOut" }}
-    >
+    <div className="max-w-3xl h-full w-full">
       <div className="flex flex-col gap-y-12">
         <div className="">
           <h3
@@ -46,7 +40,7 @@ const Landing = ({ recipeCount, blockCount }: Props) => {
           <Onboarding recipeCount={recipeCount} blockCount={blockCount} />
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 
