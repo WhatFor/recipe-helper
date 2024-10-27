@@ -4,6 +4,7 @@ export const ingredientsTable = pgTable("ingredients", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   name: varchar({ length: 255 }).notNull(),
   is_pantry: boolean().notNull(),
+  user_id: varchar({ length: 32 }).notNull(),
 });
 
 export const recipesTable = pgTable("recipes", {
@@ -13,6 +14,7 @@ export const recipesTable = pgTable("recipes", {
   link: varchar({ length: 1000 }).notNull(),
   is_fast: boolean().notNull(),
   is_suitable_for_fridge: boolean().notNull(),
+  user_id: varchar({ length: 32 }).notNull(),
 });
 
 export const recipeIngredientsTable = pgTable("recipe_ingredients", {
@@ -24,11 +26,13 @@ export const recipeIngredientsTable = pgTable("recipe_ingredients", {
     .notNull()
     .references(() => ingredientsTable.id),
   quantity: varchar({ length: 100 }).notNull(),
+  user_id: varchar({ length: 32 }).notNull(),
 });
 
 export const blocksTable = pgTable("blocks", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   name: varchar({ length: 255 }).notNull(),
+  user_id: varchar({ length: 32 }).notNull(),
 });
 
 export const blockRecipesTable = pgTable("block_recipes", {
@@ -39,4 +43,5 @@ export const blockRecipesTable = pgTable("block_recipes", {
   recipeId: integer()
     .notNull()
     .references(() => recipesTable.id),
+  user_id: varchar({ length: 32 }).notNull(),
 });

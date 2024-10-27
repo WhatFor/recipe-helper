@@ -6,6 +6,7 @@ import { asc, eq } from "drizzle-orm";
 import BlockCard from "./block-card";
 import NewBlockModal from "./new-block-modal";
 import CreateBlocksWithAiModal from "./create-blocks-with-ai-modal";
+import { auth } from "@clerk/nextjs/server";
 
 interface Recipe {
   id: number;
@@ -19,6 +20,12 @@ export interface BlockWithRecipes {
 }
 
 const BlocksPage = async () => {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("You must be signed in to add an item to your cart");
+  }
+
   const db = drizzle();
 
   const result = await db
@@ -31,6 +38,7 @@ const BlocksPage = async () => {
     .from(blocksTable)
     .leftJoin(blockRecipesTable, eq(blocksTable.id, blockRecipesTable.blockId))
     .leftJoin(recipesTable, eq(recipesTable.id, blockRecipesTable.recipeId))
+    .where(eq(blocksTable.user_id, userId))
     .orderBy(asc(blocksTable.name));
 
   const uniqueBlocks = result

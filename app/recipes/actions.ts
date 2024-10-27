@@ -8,7 +8,7 @@ import {
 } from "@/db/schema";
 import { ActionResult, DataResult } from "@/types/action-result";
 import { auth } from "@clerk/nextjs/server";
-import { and, eq, ilike } from "drizzle-orm";
+import { and, eq, ilike, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/vercel-postgres";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
@@ -42,6 +42,7 @@ export async function createRecipe(
     is_fast: (formData.get("isFast") === "on") as boolean,
     is_suitable_for_fridge: (formData.get("isSuitableForFridge") ===
       "on") as boolean,
+    user_id: userId,
   };
 
   const validate = upsertRecipeSchema.safeParse(values);
@@ -115,7 +116,9 @@ export async function importRecipeUsingAi(
   const existingRecipeLink = await db
     .select({ link: recipesTable.link })
     .from(recipesTable)
-    .where(eq(recipesTable.link, values.link));
+    .where(
+      and(eq(recipesTable.link, values.link), eq(recipesTable.user_id, userId))
+    );
 
   if (existingRecipeLink.length > 0) {
     return {
@@ -228,6 +231,7 @@ export async function completeAiRecipeImport(
         link: data.link,
         is_fast: data.is_fast,
         is_suitable_for_fridge: data.is_suitable_for_fridge,
+        user_id: userId,
       })
       .returning({ recipeId: recipesTable.id });
 
@@ -238,7 +242,11 @@ export async function completeAiRecipeImport(
     const insertedIngredients = await db
       .insert(ingredientsTable)
       .values(
-        data.ingredients.map((x) => ({ name: x.name, is_pantry: x.is_pantry }))
+        data.ingredients.map((x) => ({
+          name: x.name,
+          is_pantry: x.is_pantry,
+          user_id: userId,
+        }))
       )
       .returning({
         ingredientId: ingredientsTable.id,
@@ -253,6 +261,7 @@ export async function completeAiRecipeImport(
         ingredientId: insertedIngredients.find((y) => y.name === x.name)!
           .ingredientId,
         quantity: x.quantity,
+        user_id: userId,
       }))
     );
 
@@ -314,7 +323,10 @@ export async function updateRecipe(
 
   const db = drizzle();
 
-  await db.update(recipesTable).set(values).where(eq(recipesTable.id, id));
+  await db
+    .update(recipesTable)
+    .set(values)
+    .where(and(eq(recipesTable.id, id), eq(recipesTable.user_id, userId)));
 
   revalidatePath("/recipes");
 
@@ -340,12 +352,34 @@ export async function deleteRecipe(id: number): Promise<ActionResult> {
 
   await db
     .delete(recipeIngredientsTable)
-    .where(eq(recipeIngredientsTable.recipeId, id));
+    .where(
+      and(
+        eq(recipeIngredientsTable.recipeId, id),
+        eq(recipeIngredientsTable.user_id, userId)
+      )
+    );
 
-  // todo: have orphaned ingredients now. don't care too much, but.
+  // Drizzle doesn't do delete with joins. https://github.com/drizzle-team/drizzle-orm/issues/2304
+  // the sql template string escapes variables, not a sql injection risk.
+  await db.execute(sql`DELETE FROM ${ingredientsTable}
+  USING ${recipeIngredientsTable}
+  WHERE ${ingredientsTable.id} = ${recipeIngredientsTable.ingredientId}
+    AND ${recipeIngredientsTable.recipeId} = ${id}
+    AND ${ingredientsTable.user_id} = ${userId}
+  RETURNING *`);
 
-  await db.delete(blockRecipesTable).where(eq(blockRecipesTable.recipeId, id));
-  await db.delete(recipesTable).where(eq(recipesTable.id, id));
+  await db
+    .delete(blockRecipesTable)
+    .where(
+      and(
+        eq(blockRecipesTable.recipeId, id),
+        eq(blockRecipesTable.user_id, userId)
+      )
+    );
+
+  await db
+    .delete(recipesTable)
+    .where(and(eq(recipesTable.id, id), eq(recipesTable.user_id, userId)));
 
   revalidatePath("/recipes");
 
@@ -391,7 +425,12 @@ export async function findIngredients(
       id: recipeIngredientsTable.ingredientId,
     })
     .from(recipeIngredientsTable)
-    .where(eq(recipeIngredientsTable.recipeId, recipeId));
+    .where(
+      and(
+        eq(recipeIngredientsTable.recipeId, recipeId),
+        eq(recipeIngredientsTable.user_id, userId)
+      )
+    );
 
   const result = await db
     .select({
@@ -399,7 +438,12 @@ export async function findIngredients(
       name: ingredientsTable.name,
     })
     .from(ingredientsTable)
-    .where(ilike(ingredientsTable.name, "%" + name + "%"));
+    .where(
+      and(
+        ilike(ingredientsTable.name, "%" + name + "%"),
+        eq(ingredientsTable.user_id, userId)
+      )
+    );
 
   const filtered = result.filter(
     (x) => !existingIngredients.some((y) => y.id === x.id)
@@ -429,6 +473,7 @@ export async function addIngredientToRecipe(
     recipeId: recipeId,
     ingredientId: ingredientId,
     quantity: "0",
+    user_id: userId,
   });
 
   revalidatePath("/recipes");
@@ -461,7 +506,10 @@ export async function removeIngredientFromRecipe(
     .where(
       and(
         eq(recipeIngredientsTable.recipeId, recipeId),
-        eq(recipeIngredientsTable.ingredientId, ingredientId)
+        and(
+          eq(recipeIngredientsTable.ingredientId, ingredientId),
+          eq(recipeIngredientsTable.user_id, userId)
+        )
       )
     );
 

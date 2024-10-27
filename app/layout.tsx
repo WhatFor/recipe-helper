@@ -44,9 +44,9 @@ export default async function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <RequireAuth>
-        <html className="dark bg-background" lang="en">
-          <body>
+      <html className="dark bg-background" lang="en">
+        <body>
+          <RequireAuth>
             <div className="flex flex-col justify-center items-center">
               <NavBar />
               <div className="w-full max-w-2xl flex flex-col gap-y-12 pb-8 pt-4">
@@ -54,9 +54,9 @@ export default async function RootLayout({
               </div>
             </div>
             <Toaster />
-          </body>
-        </html>
-      </RequireAuth>
+          </RequireAuth>
+        </body>
+      </html>
     </ClerkProvider>
   );
 }

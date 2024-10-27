@@ -34,6 +34,7 @@ export async function createBlock(
 
   const values = {
     name: formData.get("blockName") as string,
+    user_id: userId,
   };
 
   const validate = upsertBlockSchema.safeParse(values);
@@ -102,7 +103,12 @@ export async function createBlocksWithAi(): Promise<
         ingredientsTable,
         eq(recipeIngredientsTable.ingredientId, ingredientsTable.id)
       )
-      .where(eq(ingredientsTable.is_pantry, false));
+      .where(
+        and(
+          eq(ingredientsTable.is_pantry, false),
+          eq(recipesTable.user_id, userId)
+        )
+      );
 
     const uniqueRecipes = recipes
       .map((x) => ({
@@ -254,7 +260,10 @@ export async function updateBlock(
 
   const db = drizzle();
 
-  await db.update(blocksTable).set(values).where(eq(blocksTable.id, id));
+  await db
+    .update(blocksTable)
+    .set(values)
+    .where(and(eq(blocksTable.id, id), eq(blocksTable.user_id, userId)));
 
   revalidatePath("/blocks");
 
@@ -278,7 +287,9 @@ export async function deleteBlock(id: number): Promise<ActionResult> {
 
   const db = drizzle();
 
-  await db.delete(blocksTable).where(eq(blocksTable.id, id));
+  await db
+    .delete(blocksTable)
+    .where(and(eq(blocksTable.id, id), eq(blocksTable.user_id, userId)));
 
   revalidatePath("/blocks");
 
@@ -324,7 +335,12 @@ export async function findRecipe(
       id: blockRecipesTable.recipeId,
     })
     .from(blockRecipesTable)
-    .where(eq(blockRecipesTable.blockId, blockId));
+    .where(
+      and(
+        eq(blockRecipesTable.blockId, blockId),
+        eq(blockRecipesTable.user_id, userId)
+      )
+    );
 
   const result = await db
     .select({
@@ -332,7 +348,12 @@ export async function findRecipe(
       name: recipesTable.name,
     })
     .from(recipesTable)
-    .where(ilike(recipesTable.name, "%" + name + "%"));
+    .where(
+      and(
+        ilike(recipesTable.name, "%" + name + "%"),
+        eq(recipesTable.user_id, userId)
+      )
+    );
 
   const filtered = result.filter(
     (x) => !existingRecipes.some((y) => y.id === x.id)
@@ -361,6 +382,7 @@ export async function addRecipeToBlock(
   await db.insert(blockRecipesTable).values({
     blockId,
     recipeId,
+    user_id: userId,
   });
 
   revalidatePath("/blocks");
@@ -393,7 +415,10 @@ export async function removeRecipeFromBlock(
     .where(
       and(
         eq(blockRecipesTable.blockId, blockId),
-        eq(blockRecipesTable.recipeId, recipeId)
+        and(
+          eq(blockRecipesTable.recipeId, recipeId),
+          eq(blockRecipesTable.user_id, userId)
+        )
       )
     );
 

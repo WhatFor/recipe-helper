@@ -3,7 +3,7 @@
 import { ingredientsTable } from "@/db/schema";
 import { ActionResult } from "@/types/action-result";
 import { auth } from "@clerk/nextjs/server";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/vercel-postgres";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
@@ -26,6 +26,7 @@ export async function createIngredient(
   const values = {
     name: formData.get("ingredientName") as string,
     is_pantry: (formData.get("isPantry") === "on") as boolean,
+    user_id: userId,
   };
 
   const validate = createIngredientSchema.safeParse(values);
@@ -65,7 +66,11 @@ export async function deleteIngredient(id: number): Promise<ActionResult> {
 
   const db = drizzle();
 
-  await db.delete(ingredientsTable).where(eq(ingredientsTable.id, id));
+  await db
+    .delete(ingredientsTable)
+    .where(
+      and(eq(ingredientsTable.id, id), eq(ingredientsTable.user_id, userId))
+    );
 
   revalidatePath("/ingredients");
 

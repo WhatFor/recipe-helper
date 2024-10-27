@@ -29,6 +29,20 @@
       "when": 1729786622705,
       "tag": "0003_supreme_shaman",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1730028065283,
+      "tag": "0005_wealthy_micromax",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1730028112023,
+      "tag": "0006_optimal_rocket_racer",
+      "breakpoints": true
     }
   ]
 }

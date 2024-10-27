@@ -10,6 +10,7 @@ import { desc, eq } from "drizzle-orm";
 import NewRecipeModal from "./new-recipe-modal";
 import RecipeCard from "./recipe-card";
 import NewRecipeWithAiModal from "./new-recipe-with-ai-modal";
+import { auth } from "@clerk/nextjs/server";
 
 interface Ingredient {
   id: number;
@@ -29,6 +30,12 @@ export interface RecipeWithIngredients {
 }
 
 const IngredientsPage = async () => {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("You must be signed in to do that.");
+  }
+
   const db = drizzle();
 
   const result = await db
@@ -53,6 +60,7 @@ const IngredientsPage = async () => {
       ingredientsTable,
       eq(recipeIngredientsTable.ingredientId, ingredientsTable.id)
     )
+    .where(eq(recipesTable.user_id, userId))
     .orderBy(desc(recipesTable.id));
 
   const uniqueRecipes = result
