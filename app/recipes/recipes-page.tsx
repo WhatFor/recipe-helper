@@ -8,30 +8,53 @@ import NewRecipeWithAiModal from "./new-recipe-with-ai-modal";
 import { Card, CardContent } from "@/components/ui/card";
 import { PlusIcon } from "@radix-ui/react-icons";
 import { RecipeWithIngredients } from "./page";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { Input } from "@/components/ui/input";
+import useDebounce from "@/hooks/use-debounce";
 
 interface Props {
   recipes: RecipeWithIngredients[];
 }
 
 const RecipesPage = ({ recipes }: Props) => {
+  const [search, setSearch] = useState("");
   const params = useSearchParams();
   const aiImport = params.get("ai_import");
+
+  const debouncedSearch = useDebounce(search, 300);
 
   const [newRecipeWithAiModalOpen, setNewRecipeWithAiModalOpen] = useState(
     aiImport === "1"
   );
 
+  const onSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+  };
+
+  useEffect(() => {
+    if (debouncedSearch.length > 0) {
+      alert("Not yet implemented");
+    }
+  }, [debouncedSearch]);
+
   return (
     <div className="flex flex-col gap-y-3">
       <Header>Your recipes</Header>
-      <div className="flex flex-col-reverse md:flex-row gap-3 justify-end">
-        <NewRecipeModal />
-        <NewRecipeWithAiModal
-          open={newRecipeWithAiModalOpen}
-          setOpen={setNewRecipeWithAiModalOpen}
+      <div className="flex gap-3 flex-col md:flex-row md:justify-between">
+        <Input
+          value={search}
+          onChange={onSearch}
+          placeholder="Search..."
+          className="md:max-w-64"
         />
+        <div className="flex flex-col-reverse md:flex-row gap-3">
+          <NewRecipeModal />
+          <NewRecipeWithAiModal
+            open={newRecipeWithAiModalOpen}
+            setOpen={setNewRecipeWithAiModalOpen}
+          />
+        </div>
       </div>
       <ScrollArea
         className="h-full w-full rounded-xl border p-3 mb-3"
