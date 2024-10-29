@@ -365,6 +365,15 @@ export async function deleteBlock(id: number): Promise<ActionResult> {
     );
 
   await db
+    .delete(blockShoppingListItemsTable)
+    .where(
+      and(
+        eq(blockShoppingListItemsTable.blockId, id),
+        eq(blockShoppingListItemsTable.user_id, userId)
+      )
+    );
+
+  await db
     .delete(blocksTable)
     .where(and(eq(blocksTable.id, id), eq(blocksTable.user_id, userId)));
 
