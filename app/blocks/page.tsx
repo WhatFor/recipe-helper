@@ -4,6 +4,9 @@ import { asc, eq } from "drizzle-orm";
 import { auth } from "@clerk/nextjs/server";
 import BlocksPage from "./blocks-page";
 
+// AI stuff can be slow
+export const maxDuration = 90;
+
 interface Recipe {
   id: number;
   name: string;

@@ -19,12 +19,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
 
 const BlockShoppingListModal = ({ block }: { block: BlockWithRecipes }) => {
   const [generating, setGenerating] = useState(false);
   const [shoppingList, setShoppingList] = useState<ShoppingListItem[]>([]);
   const [open, setOpen] = useState(false);
   const [listCopied, setListCopied] = useState(false);
+  const { toast } = useToast();
 
   const onOpenChange = (open: boolean) => {
     setOpen(open);
@@ -42,23 +44,35 @@ const BlockShoppingListModal = ({ block }: { block: BlockWithRecipes }) => {
         setShoppingList(response.data.list);
       } else {
         setGenerating(true);
-
         generateShoppingList();
       }
     }
   };
 
   const generateShoppingList = async () => {
-    const response = await generateBlockShoppingList(block.id);
+    try {
+      const response = await generateBlockShoppingList(block.id);
 
-    if (response.successful && response.data) {
-      if (
-        response.data.exists &&
-        response.data.list &&
-        response.data.list.length > 0
-      ) {
-        setShoppingList(response.data.list);
+      if (response.successful && response.data) {
+        if (
+          response.data.exists &&
+          response.data.list &&
+          response.data.list.length > 0
+        ) {
+          setShoppingList(response.data.list);
+        }
+      } else {
+        toast({
+          title: response.message?.title ?? "Something went wrong",
+          description:
+            response.message?.description ?? "Please try again later",
+        });
       }
+    } catch {
+      toast({
+        title: "Something went wrong",
+        description: "Please try again later",
+      });
     }
 
     setGenerating(false);
