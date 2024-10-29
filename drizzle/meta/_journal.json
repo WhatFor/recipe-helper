@@ -43,6 +43,34 @@
       "when": 1730028112023,
       "tag": "0006_optimal_rocket_racer",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1730228765415,
+      "tag": "0006_parallel_ultragirl",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1730229015287,
+      "tag": "0007_fearless_natasha_romanoff",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1730229227375,
+      "tag": "0008_panoramic_carnage",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1730235164249,
+      "tag": "0009_damp_warpath",
+      "breakpoints": true
     }
   ]
 }

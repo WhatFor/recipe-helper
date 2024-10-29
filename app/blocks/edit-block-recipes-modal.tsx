@@ -175,6 +175,7 @@ const EditBlockRecipesModal = ({ block }: { block: BlockWithRecipes }) => {
                 {recipe.name}
               </p>
               <Button
+                variant="destructive"
                 onClick={() => onClickRemoveRecipe(recipe.id)}
                 size="icon"
               >

@@ -1,8 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { AiBlocksResult } from "./actions";
+import { AiBlocksResult, completeAiBlocksImport } from "./actions";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { EditableInput } from "@/components/ui/input";
 import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { UpdateIcon } from "@radix-ui/react-icons";
 
 interface Props {
   result: AiBlocksResult;
@@ -10,10 +12,28 @@ interface Props {
 }
 
 const AiBlocksEditor = ({ result, onComplete }: Props) => {
+  const [saving, setSaving] = useState(false);
+  const { toast } = useToast();
   const [state, setState] = useState<AiBlocksResult>(result);
 
   const onChange = (key: string, value: unknown) => {
     setState((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const onClickSave = async () => {
+    setSaving(true);
+    const result = await completeAiBlocksImport(state);
+    setSaving(false);
+
+    toast({
+      title: result.message?.title,
+      description: result.message?.description,
+      variant: result.successful ? "default" : "destructive",
+    });
+
+    if (result.successful) {
+      onComplete();
+    }
   };
 
   return (
@@ -82,7 +102,9 @@ const AiBlocksEditor = ({ result, onComplete }: Props) => {
           ))}
         </div>
       </ScrollArea>
-      <Button onClick={onComplete}>Complete</Button>
+      <Button disabled={saving} onClick={onClickSave}>
+        {saving ? <UpdateIcon className="animate-spin" /> : "Complete"}
+      </Button>
     </div>
   );
 };

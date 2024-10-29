@@ -1,0 +1,1 @@
+ALTER TABLE "block_shopping_list_items" ADD COLUMN "section" varchar(255) NOT NULL;

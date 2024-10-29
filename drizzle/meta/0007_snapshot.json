@@ -1,6 +1,6 @@
 {
-  "id": "14272da5-081e-456d-ac49-371ba0c2a8a4",
-  "prevId": "9054e285-c7dc-4128-8092-284fa8185db0",
+  "id": "4ac9a20e-c02b-4b19-960c-4b2240e58b4b",
+  "prevId": "14272da5-081e-456d-ac49-371ba0c2a8a4",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -104,8 +104,14 @@
           "primaryKey": false,
           "notNull": true
         },
-        "item_str": {
-          "name": "item_str",
+        "item_name": {
+          "name": "item_name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "item_amount": {
+          "name": "item_amount",
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true

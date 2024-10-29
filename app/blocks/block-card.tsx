@@ -11,8 +11,9 @@ import { BlockWithRecipes } from "./page";
 import { Badge } from "@/components/ui/badge";
 import EditBlockRecipesModal from "./edit-block-recipes-modal";
 import DeleteButton from "@/components/ui/delete-button";
+import BlockShoppingListModal from "./block-shopping-list-modal";
 
-const RecipeCard = ({ block }: { block: BlockWithRecipes }) => {
+const BlockCard = ({ block }: { block: BlockWithRecipes }) => {
   const [deleting, setDeleting] = useState(false);
 
   const [result, setResult] = useState<ActionResult>({
@@ -45,10 +46,11 @@ const RecipeCard = ({ block }: { block: BlockWithRecipes }) => {
         <div className="flex gap-x-3 pt-2">
           <EditBlockModal block={block} />
           <EditBlockRecipesModal block={block} />
+          <BlockShoppingListModal block={block} />
         </div>
       </CardHeader>
     </Card>
   );
 };
 
-export default RecipeCard;
+export default BlockCard;

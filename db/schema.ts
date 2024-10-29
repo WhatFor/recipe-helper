@@ -45,3 +45,16 @@ export const blockRecipesTable = pgTable("block_recipes", {
     .references(() => recipesTable.id),
   user_id: varchar({ length: 32 }).notNull(),
 });
+
+export const blockShoppingListItemsTable = pgTable(
+  "block_shopping_list_items",
+  {
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    blockId: integer()
+      .notNull()
+      .references(() => blocksTable.id),
+    item_name: varchar({ length: 255 }).notNull(),
+    item_amount: varchar({ length: 255 }).notNull(),
+    user_id: varchar({ length: 32 }).notNull(),
+  }
+);
