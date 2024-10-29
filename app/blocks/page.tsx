@@ -5,7 +5,7 @@ import { auth } from "@clerk/nextjs/server";
 import BlocksPage from "./blocks-page";
 
 // AI stuff can be slow
-export const maxDuration = 90;
+export const maxDuration = 60;
 
 interface Recipe {
   id: number;
