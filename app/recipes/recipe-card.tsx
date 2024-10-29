@@ -45,7 +45,7 @@ const RecipeCard = ({ recipe }: { recipe: RecipeWithIngredients }) => {
   return (
     <Card key={recipe.id} className="relative">
       <DeleteButton deleting={deleting} onDelete={onDelete} />
-      <CardHeader className="pr-20 pb-5 h-full">
+      <CardHeader className="pb-5 h-full">
         <CardTitle className="capitalize truncate flex gap-x-3 items-center mb-1">
           <span>{recipe.name}</span>
         </CardTitle>

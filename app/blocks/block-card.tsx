@@ -32,7 +32,7 @@ const BlockCard = ({ block }: { block: BlockWithRecipes }) => {
   return (
     <Card key={block.id} className="relative">
       <DeleteButton deleting={deleting} onDelete={onDelete} />
-      <CardHeader className="pr-20">
+      <CardHeader>
         <CardTitle className="capitalize truncate flex gap-x-3 items-center mb-1">
           <span>{block.name}</span>
         </CardTitle>
