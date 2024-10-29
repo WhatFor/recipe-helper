@@ -22,6 +22,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 
 const BlockShoppingListModal = ({ block }: { block: BlockWithRecipes }) => {
+  const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [shoppingList, setShoppingList] = useState<ShoppingListItem[]>([]);
   const [open, setOpen] = useState(false);
@@ -34,6 +35,7 @@ const BlockShoppingListModal = ({ block }: { block: BlockWithRecipes }) => {
 
   const fetchShoppingList = async () => {
     const response = await getShoppingList(block.id);
+    setLoading(false);
 
     if (response.successful && response.data) {
       if (
@@ -112,6 +114,12 @@ const BlockShoppingListModal = ({ block }: { block: BlockWithRecipes }) => {
         <DialogHeader>
           <DialogTitle>{block.name} shopping list</DialogTitle>
         </DialogHeader>
+        {loading && (
+          <div className="rounded-lg bg-foreground/10 flex flex-col px-3 py-8 items-center justify-center gap-y-4">
+            <UpdateIcon className="size-6 text-foreground animate-spin" />
+            <p className="text-sm text-foreground/70">Loading...</p>
+          </div>
+        )}
         {generating && (
           <div className="rounded-lg bg-foreground/10 flex flex-col px-3 py-8 items-center justify-center gap-y-4">
             <UpdateIcon className="size-6 text-foreground animate-spin" />
