@@ -7,9 +7,9 @@ import NewBlockModal from "./new-block-modal";
 import { BlockWithRecipes } from "./page";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent } from "@/components/ui/card";
-import { PlusIcon } from "@radix-ui/react-icons";
+import { Cross1Icon, PlusIcon } from "@radix-ui/react-icons";
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import useDebounce from "@/hooks/use-debounce";
 
@@ -18,8 +18,11 @@ interface Props {
 }
 
 const BlocksPage = ({ blocks }: Props) => {
-  const [search, setSearch] = useState("");
+  const router = useRouter();
+  const pathname = usePathname();
   const params = useSearchParams();
+
+  const [search, setSearch] = useState("");
   const aiImport = params.get("ai_import");
 
   const debouncedSearch = useDebounce(search, 300);
@@ -34,20 +37,37 @@ const BlocksPage = ({ blocks }: Props) => {
 
   useEffect(() => {
     if (debouncedSearch.length > 0) {
-      alert("Not yet implemented");
+      const p = new URLSearchParams(params.toString());
+      p.set("search", debouncedSearch);
+      router.push(pathname + "?" + p.toString());
+    } else {
+      const p = new URLSearchParams(params.toString());
+      p.delete("search");
+      router.push(pathname + "?" + p.toString());
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearch]);
 
   return (
     <div className="flex flex-col gap-y-3">
       <Header>Meal plans</Header>
       <div className="flex gap-3 flex-col md:flex-row md:justify-between">
-        <Input
-          value={search}
-          onChange={onSearch}
-          placeholder="Search..."
-          className="md:max-w-64"
-        />
+        <div className="relative">
+          <Input
+            value={search}
+            onChange={onSearch}
+            placeholder="Search..."
+            className="md:max-w-64"
+          />
+          {search.length > 0 && (
+            <button
+              onClick={() => setSearch("")}
+              className="absolute inset-y-0 right-0 flex items-center justify-center p-2"
+            >
+              <Cross1Icon className="size-5 text-foreground/50" />
+            </button>
+          )}
+        </div>
         <div className="flex flex-col-reverse md:flex-row gap-3">
           <NewBlockModal />
           <CreateBlocksWithAiModal

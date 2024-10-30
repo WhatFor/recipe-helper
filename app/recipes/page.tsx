@@ -1,6 +1,6 @@
 import RecipesPage from "./recipes-page";
 import { drizzle } from "drizzle-orm/vercel-postgres";
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, and, ilike } from "drizzle-orm";
 import { auth } from "@clerk/nextjs/server";
 
 import {
@@ -26,7 +26,13 @@ export interface RecipeWithIngredients {
   ingredients: Ingredient[];
 }
 
-const Page = async () => {
+const Page = async ({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
+}) => {
+  const { search } = await searchParams;
+
   const { userId } = await auth();
 
   if (!userId) {
@@ -58,7 +64,12 @@ const Page = async () => {
       ingredientsTable,
       eq(recipeIngredientsTable.ingredientId, ingredientsTable.id)
     )
-    .where(eq(recipesTable.user_id, userId))
+    .where(
+      and(
+        eq(recipesTable.user_id, userId),
+        ilike(recipesTable.name, "%" + (search ?? "") + "%")
+      )
+    )
     .orderBy(desc(recipesTable.id));
 
   const uniqueRecipes = result

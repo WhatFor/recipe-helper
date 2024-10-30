@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/vercel-postgres";
 import { blockRecipesTable, blocksTable, recipesTable } from "@/db/schema";
-import { asc, eq } from "drizzle-orm";
+import { asc, eq, and, ilike } from "drizzle-orm";
 import { auth } from "@clerk/nextjs/server";
 import BlocksPage from "./blocks-page";
 
@@ -19,7 +19,13 @@ export interface BlockWithRecipes {
   recipes: Recipe[];
 }
 
-const Page = async () => {
+const Page = async ({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
+}) => {
+  const { search } = await searchParams;
+
   const { userId } = await auth();
 
   if (!userId) {
@@ -39,7 +45,12 @@ const Page = async () => {
     .from(blocksTable)
     .leftJoin(blockRecipesTable, eq(blocksTable.id, blockRecipesTable.blockId))
     .leftJoin(recipesTable, eq(recipesTable.id, blockRecipesTable.recipeId))
-    .where(eq(blocksTable.user_id, userId))
+    .where(
+      and(
+        eq(blocksTable.user_id, userId),
+        ilike(blocksTable.name, "%" + (search ?? "") + "%")
+      )
+    )
     .orderBy(asc(blocksTable.name));
 
   const uniqueBlocks = result
