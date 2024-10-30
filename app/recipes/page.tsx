@@ -26,11 +26,15 @@ export interface RecipeWithIngredients {
   ingredients: Ingredient[];
 }
 
-const Page = async ({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | string[] | undefined };
-}) => {
+type SearchParams = Promise<{
+  search: string;
+  fast: string;
+  slow: string;
+  fridge: string;
+  non_fridge: string;
+}>;
+
+const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
   const { search, fast, slow, fridge, non_fridge } = await searchParams;
 
   const { userId } = await auth();

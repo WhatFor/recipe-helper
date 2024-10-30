@@ -19,11 +19,11 @@ export interface BlockWithRecipes {
   recipes: Recipe[];
 }
 
-const Page = async ({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | string[] | undefined };
-}) => {
+type SearchParams = Promise<{
+  search: string;
+}>;
+
+const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
   const { search } = await searchParams;
 
   const { userId } = await auth();
